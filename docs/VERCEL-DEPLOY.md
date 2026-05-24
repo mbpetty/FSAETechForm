@@ -125,7 +125,8 @@ Local development is unchanged: keep using `js/supabase-config.js` on your machi
 | Problem | Fix |
 |---------|-----|
 | Build fails: missing env vars | Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` in Vercel, redeploy |
-| “Supabase is not configured” on live site | Redeploy after env vars; check build logs for “Wrote js/supabase-config.js” |
+| No Output Directory named "public" | Fixed in repo — `vercel.json` sets `outputDirectory: "public"`; pull latest and redeploy |
+| “Supabase is not configured” on live site | Redeploy after env vars; check build logs for “Wrote … supabase-config.js” |
 | Login works locally but not on Vercel | Set Supabase **Site URL** to your Vercel URL |
 | RLS / permission errors | User must be **approved** in Manage → Users |
 | Slow on venue Wi‑Fi | Vercel + Supabase are cloud-hosted; venue only needs internet, not your laptop |

@@ -7,3 +7,6 @@ js/supabase-config.js
 
 # If you run npm install locally
 node_modules/
+
+# Vercel build output
+public/

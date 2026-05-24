@@ -16,11 +16,15 @@ if (url.includes("YOUR_PROJECT") || key.includes("YOUR_ANON")) {
   process.exit(1);
 }
 
-const outPath = path.join(__dirname, "..", "js", "supabase-config.js");
+const outPath =
+  process.env.SUPABASE_CONFIG_OUT || path.join(__dirname, "..", "js", "supabase-config.js");
+
+fs.mkdirSync(path.dirname(outPath), { recursive: true });
+
 const contents = `// Generated at build time — do not edit on Vercel deployments.
 window.SUPABASE_URL = ${JSON.stringify(url)};
 window.SUPABASE_ANON_KEY = ${JSON.stringify(key)};
 `;
 
 fs.writeFileSync(outPath, contents, "utf8");
-console.log("Wrote js/supabase-config.js for deployment.");
+console.log(`Wrote ${path.relative(process.cwd(), outPath)} for deployment.`);

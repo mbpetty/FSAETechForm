@@ -1,5 +1,6 @@
 {
   "buildCommand": "npm run build",
+  "outputDirectory": "public",
   "installCommand": "echo \"No npm dependencies\"",
   "framework": null,
   "headers": [
