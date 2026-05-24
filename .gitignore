@@ -1,0 +1,9 @@
+# Local Supabase keys — never commit
+js/supabase-config.js
+
+# OS / tooling
+.DS_Store
+.vercel
+
+# If you run npm install locally
+node_modules/

@@ -1,0 +1,7 @@
+{
+  "name": "fsae-tech-form",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/generate-supabase-config.js"
+  }
+}

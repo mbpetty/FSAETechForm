@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e1b4b" />
+    <title>Sign up — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+  </head>
+  <body>
+    <div class="app auth-page">
+      <header class="app-header">
+        <h1>Tech Inspection</h1>
+      </header>
+
+      <main class="auth-main">
+        <div class="auth-card">
+          <h2>Request access</h2>
+          <p>An admin must approve your account before you can use the app. Admin accounts cannot be requested here.</p>
+
+          <label class="auth-field">
+            <span>Full name</span>
+            <input type="text" id="signup-name" autocomplete="name" placeholder="Jane Smith" required />
+          </label>
+
+          <label class="auth-field">
+            <span>Email</span>
+            <input type="email" id="signup-email" autocomplete="email" placeholder="you@school.edu" required />
+          </label>
+
+          <span class="auth-field"><span>Account type requested</span></span>
+          <div class="auth-role-options">
+            <label class="auth-role-option">
+              <input type="radio" name="requested-role" value="inspector" checked />
+              <div>
+                <strong>Inspector</strong>
+                <small>Record pass/fail for any team. Access inspector and dashboard views.</small>
+              </div>
+            </label>
+            <label class="auth-role-option">
+              <input type="radio" name="requested-role" value="team_member" />
+              <div>
+                <strong>Team member</strong>
+                <small>View your team's inspection status and notes only (read-only).</small>
+              </div>
+            </label>
+          </div>
+
+          <label class="auth-field" id="signup-team-wrap" hidden>
+            <span>Your team</span>
+            <select id="signup-team"></select>
+          </label>
+
+          <div class="auth-actions">
+            <button type="button" class="auth-btn auth-btn--primary" id="signup-send-btn">Send verification code</button>
+          </div>
+
+          <div id="signup-code-step" class="auth-code-step" hidden>
+            <p class="auth-hint">Enter the 8-digit number from your email (not the link).</p>
+            <label class="auth-field">
+              <span>Verification code</span>
+              <input type="text" id="otp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="12345678" />
+            </label>
+            <div class="auth-actions">
+              <button type="button" class="auth-btn auth-btn--primary" id="signup-verify-btn">Verify & submit request</button>
+            </div>
+          </div>
+
+          <p id="auth-message" class="auth-message" hidden role="status"></p>
+        </div>
+
+        <p class="auth-footer">
+          Already have an account? <a href="login.html">Log in</a>
+        </p>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/csv-utils.js"></script>
+    <script src="js/data-store.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/signup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e1b4b" />
+    <title>Log in — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+  </head>
+  <body>
+    <div class="app auth-page">
+      <header class="app-header">
+        <h1>Tech Inspection</h1>
+      </header>
+
+      <main class="auth-main">
+        <div class="auth-card">
+          <h2>Log in</h2>
+          <p>Enter your email. We'll send an <strong>8-digit code</strong> — type it here on this tablet (don't use the email link).</p>
+          <p class="auth-hint">Check email on your phone, then enter all 8 digits below.</p>
+
+          <label class="auth-field">
+            <span>Email</span>
+            <input type="email" id="login-email" autocomplete="email" placeholder="you@school.edu" required />
+          </label>
+
+          <div class="auth-actions">
+            <button type="button" class="auth-btn auth-btn--primary" id="login-send-btn">Send code</button>
+          </div>
+
+          <div id="login-code-step" class="auth-code-step" hidden>
+            <p class="auth-hint">Enter the 8-digit number from your email (not the link).</p>
+            <label class="auth-field">
+              <span>Login code</span>
+              <input type="text" id="otp-code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="12345678" />
+            </label>
+            <div class="auth-actions">
+              <button type="button" class="auth-btn auth-btn--primary" id="login-verify-btn">Verify & continue</button>
+            </div>
+          </div>
+
+          <p id="auth-message" class="auth-message" hidden role="status"></p>
+        </div>
+
+        <p class="auth-footer">
+          New here? <a href="signup.html">Sign up for access</a>
+        </p>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>

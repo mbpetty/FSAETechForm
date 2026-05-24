@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e1b4b" />
+    <title>Manage — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+  </head>
+  <body>
+    <div class="app admin-app">
+      <header class="app-header app-header--row">
+        <h1>Manage data</h1>
+        <nav class="header-nav" aria-label="App views"></nav>
+      </header>
+
+      <nav class="admin-tabs" aria-label="Admin sections">
+        <button type="button" class="admin-tab is-active" data-tab="inspections">Inspections</button>
+        <button type="button" class="admin-tab" data-tab="teams">Teams</button>
+        <button type="button" class="admin-tab" data-tab="competitions">Competitions</button>
+        <button type="button" class="admin-tab" data-tab="users">Users</button>
+      </nav>
+
+      <p id="admin-toast" class="admin-toast" hidden role="status"></p>
+      <div id="admin-setup-banner" class="admin-setup-banner" hidden role="alert"></div>
+
+      <input type="file" id="inspection-csv-input" accept=".csv,text/csv" hidden />
+      <input type="file" id="team-csv-input" accept=".csv,text/csv" hidden />
+
+      <!-- Inspections -->
+      <section id="panel-inspections" class="admin-panel">
+        <div class="admin-toolbar">
+          <h2>Inspections</h2>
+          <div class="admin-toolbar-actions">
+            <a class="btn-link" href="templates/inspection-list-template.csv" download>CSV template</a>
+            <button type="button" class="btn-secondary" id="upload-inspection-csv-btn">Upload CSV</button>
+            <button type="button" class="btn-primary" id="add-inspection-btn">Add inspection</button>
+          </div>
+        </div>
+
+        <form id="inspection-form" class="admin-form" hidden>
+          <h3 id="inspection-form-title">Add inspection</h3>
+          <input type="hidden" id="inspection-edit-key" />
+          <div class="form-grid">
+            <label class="span-2" id="inspection-id-display-wrap" hidden>
+              <span>Inspection ID</span>
+              <input type="text" id="inspection-id-display" readonly />
+            </label>
+            <label class="span-2">
+              <span>Title</span>
+              <input type="text" id="inspection-title" required />
+            </label>
+            <label class="span-2">
+              <span>Description</span>
+              <textarea id="inspection-description" rows="4" required></textarea>
+            </label>
+            <div class="span-2">
+              <span class="field-label">Stations / sections</span>
+              <p class="field-hint">Select all that apply (e.g. June uses stations, May uses vehicle sections).</p>
+              <div id="inspection-stations-list" class="station-checkboxes"></div>
+              <div class="station-add-row">
+                <input type="text" id="inspection-station-custom" placeholder="Add custom station or section" />
+                <button type="button" class="btn-secondary" id="add-station-btn">Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="cancel-inspection-btn">Cancel</button>
+            <button type="submit" class="btn-primary">Save inspection</button>
+          </div>
+        </form>
+
+        <ul id="inspection-admin-list" class="admin-list"></ul>
+      </section>
+
+      <!-- Teams -->
+      <section id="panel-teams" class="admin-panel" hidden>
+        <div class="admin-toolbar">
+          <h2>Teams</h2>
+          <div class="admin-toolbar-actions">
+            <a class="btn-link" href="templates/team-list-template.csv" download>CSV template</a>
+            <button type="button" class="btn-secondary" id="upload-team-csv-btn">Upload CSV</button>
+            <button type="button" class="btn-primary" id="add-team-btn">Add team</button>
+          </div>
+        </div>
+
+        <form id="team-form" class="admin-form" hidden>
+          <h3 id="team-form-title">Add team</h3>
+          <input type="hidden" id="team-edit-id" />
+          <div class="form-grid">
+            <label>
+              <span>Car number</span>
+              <input type="text" id="team-car" required placeholder="e.g. 42" />
+            </label>
+            <label>
+              <span>Competition</span>
+              <select id="team-competition" required></select>
+            </label>
+            <label class="span-2">
+              <span>Team name</span>
+              <input type="text" id="team-name" required placeholder="School or team name" />
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="cancel-team-btn">Cancel</button>
+            <button type="submit" class="btn-primary">Save team</button>
+          </div>
+        </form>
+
+        <ul id="team-admin-list" class="admin-list"></ul>
+      </section>
+
+      <!-- Competitions -->
+      <section id="panel-competitions" class="admin-panel" hidden>
+        <div class="admin-toolbar">
+          <h2>Competitions</h2>
+          <button type="button" class="btn-primary" id="add-competition-btn">New competition</button>
+        </div>
+
+        <form id="competition-form" class="admin-form" hidden>
+          <h3>New competition</h3>
+          <div class="form-grid">
+            <label class="span-2">
+              <span>Name</span>
+              <input type="text" id="competition-label" required placeholder="e.g. FSAE Michigan — June" />
+            </label>
+            <label class="span-2">
+              <span>ID (optional)</span>
+              <input type="text" id="competition-id" placeholder="Auto-generated from name if blank" />
+              <span class="field-hint">Used in team CSV and filters. Lowercase with dashes, e.g. michigan-june</span>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="cancel-competition-btn">Cancel</button>
+            <button type="submit" class="btn-primary">Create competition</button>
+          </div>
+        </form>
+
+        <ul id="competition-admin-list" class="admin-list"></ul>
+
+        <div id="competition-assign-panel" class="admin-form assign-panel" hidden>
+          <div class="assign-panel-head">
+            <div>
+              <h3 id="assign-panel-title">Required inspections</h3>
+              <p id="assign-panel-meta" class="field-hint"></p>
+            </div>
+            <button type="button" class="btn-secondary btn-sm" id="close-assign-panel-btn">Close</button>
+          </div>
+          <div class="assign-toolbar">
+            <button type="button" class="btn-secondary btn-sm" id="assign-select-all-btn">Select all</button>
+            <button type="button" class="btn-secondary btn-sm" id="assign-clear-all-btn">Clear all</button>
+            <button type="button" class="btn-primary btn-sm" id="assign-save-btn">Save assignments</button>
+          </div>
+          <div id="assign-inspection-list" class="assign-inspection-list"></div>
+        </div>
+      </section>
+
+      <!-- Users -->
+      <section id="panel-users" class="admin-panel" hidden>
+        <div class="admin-toolbar">
+          <h2>User access</h2>
+        </div>
+        <p class="field-hint">Approve sign-up requests and assign roles. Only admins can manage users.</p>
+        <p class="field-hint">Testing with one Gmail? Use plus aliases: <code>you+inspector@gmail.com</code>, <code>you+team@gmail.com</code> — all arrive in the same inbox.</p>
+
+        <h3 class="user-section-title">Pending approval</h3>
+        <div id="pending-users-list"></div>
+
+        <h3 class="user-section-title">Approved users</h3>
+        <div id="approved-users-list"></div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/csv-utils.js"></script>
+    <script src="js/data-store.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

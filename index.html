@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e1b4b" />
+    <title>FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header app-header--row">
+        <h1>Tech Inspection</h1>
+        <nav class="header-nav" aria-label="App views"></nav>
+      </header>
+
+      <section class="filters" aria-label="Filters">
+        <label class="filter-field">
+          <span>Competition</span>
+          <select id="filter-competition"></select>
+        </label>
+        <label class="filter-field">
+          <span>Team</span>
+          <select id="filter-school">
+            <option value="all">All teams</option>
+          </select>
+        </label>
+        <label class="filter-field">
+          <span>Station</span>
+          <select id="filter-station">
+            <option value="all">All stations</option>
+          </select>
+        </label>
+        <label class="filter-field">
+          <span>Status</span>
+          <select id="filter-status">
+            <option value="all">All</option>
+            <option value="pending">Not inspected</option>
+            <option value="pass">Passed</option>
+            <option value="fail">Failed</option>
+          </select>
+        </label>
+      </section>
+
+      <p id="team-banner" class="team-banner">
+        Select a team to record pass/fail. Results sync live for all inspectors.
+      </p>
+      <p id="sync-status" class="sync-status" hidden>Live sync on</p>
+
+      <div class="list-header">
+        <h2>Inspections</h2>
+        <p id="list-count" class="list-count"></p>
+      </div>
+
+      <p id="load-status" class="load-status">Loading inspections…</p>
+      <p id="inspector-toast" class="inspector-toast" hidden role="status"></p>
+
+      <ul class="inspection-list" id="inspection-list" aria-live="polite" hidden></ul>
+
+      <p id="empty-state" class="empty-state" hidden>No inspections match these filters.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/csv-utils.js"></script>
+    <script src="js/data-store.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/form.js"></script>
+  </body>
+</html>

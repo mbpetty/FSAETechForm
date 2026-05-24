@@ -1,0 +1,337 @@
+.auth-page {
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-main {
+  flex: 1;
+  padding: 1.25rem 1rem 2rem;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.25rem 1.1rem;
+}
+
+.auth-card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+}
+
+.auth-card p {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.auth-hint {
+  margin: 0 0 0.75rem !important;
+  font-size: 0.78rem !important;
+  color: var(--muted) !important;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.auth-field span {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.auth-field input,
+.auth-field select {
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.auth-field input:focus,
+.auth-field select:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.auth-role-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.auth-role-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: var(--surface);
+}
+
+.auth-role-option:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.auth-role-option input {
+  margin-top: 0.15rem;
+}
+
+.auth-role-option strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.auth-role-option small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.auth-btn {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.auth-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.auth-btn--secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-soft);
+}
+
+.auth-message {
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pass);
+  background: var(--pass-soft);
+  border-radius: var(--radius-sm);
+}
+
+.auth-message.is-error {
+  color: var(--fail);
+  background: var(--fail-soft);
+}
+
+.auth-footer {
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.auth-footer a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-code-step {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.auth-code-step[hidden] {
+  display: none !important;
+}
+
+.auth-user-chip {
+  display: none;
+}
+
+@media (min-width: 480px) {
+  .auth-user-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.15;
+    padding: 0 0.25rem;
+  }
+
+  .auth-user-name {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .auth-user-role {
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+.header-nav .btn-logout {
+  font-family: inherit;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pending-card {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.pending-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.pending-card h2 {
+  margin: 0 0 0.5rem;
+}
+
+.pending-detail {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.team-readonly-banner {
+  margin: 0.75rem 1rem 0;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--accent-soft);
+  border-radius: var(--radius-sm);
+}
+
+.team-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+}
+
+.team-status-pill--pass {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.team-status-pill--fail {
+  background: var(--fail-soft);
+  color: var(--fail);
+}
+
+.team-status-pill--pending {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.team-item-comment {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.user-request-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem 0.9rem;
+  margin-bottom: 0.55rem;
+}
+
+.user-request-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.user-request-name {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.user-request-meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.user-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+}
+
+.user-request-actions select {
+  min-height: 2rem;
+  padding: 0 0.5rem;
+  font-size: 0.78rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+}
+
+.user-section-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.user-section-title:first-child {
+  margin-top: 0;
+}

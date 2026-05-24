@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e1b4b" />
+    <title>Organizer Dashboard — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <div class="app dashboard-app">
+      <header class="app-header app-header--row">
+        <h1>Organizer dashboard</h1>
+        <nav class="header-nav" aria-label="App views"></nav>
+      </header>
+
+      <section class="dashboard-filters" aria-label="Dashboard filters">
+        <label class="filter-field">
+          <span>Competition</span>
+          <select id="dashboard-competition"></select>
+        </label>
+        <label class="filter-field">
+          <span>Team status</span>
+          <select id="dashboard-status">
+            <option value="all">All teams</option>
+            <option value="not-started">Not started</option>
+            <option value="in-progress">In progress</option>
+            <option value="complete">Complete</option>
+            <option value="has-failures">Has failures</option>
+          </select>
+        </label>
+      </section>
+
+      <p id="dashboard-sync" class="dashboard-sync" hidden>Live updates on</p>
+      <p id="dashboard-load" class="dashboard-load">Loading teams…</p>
+      <p id="dashboard-toast" class="dashboard-toast" hidden role="status"></p>
+
+      <section id="dashboard-summary" class="dashboard-summary" hidden aria-label="Summary"></section>
+
+      <ul id="dashboard-team-list" class="dashboard-team-list" hidden aria-live="polite"></ul>
+
+      <p id="dashboard-empty" class="dashboard-empty" hidden>No teams match these filters.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/csv-utils.js"></script>
+    <script src="js/data-store.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
