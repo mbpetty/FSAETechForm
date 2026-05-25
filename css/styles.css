@@ -228,6 +228,37 @@ body {
   color: var(--muted);
 }
 
+.btn-export {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.btn-export[hidden] {
+  display: none;
+}
+
+.item-attribution {
+  margin: 0.15rem 0 0;
+  padding: 0 0.85rem;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.item-attribution[hidden] {
+  display: none;
+}
+
 .inspection-list {
   list-style: none;
   margin: 0 0.75rem 0.75rem;

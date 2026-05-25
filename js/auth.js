@@ -217,6 +217,9 @@ function renderAuthHeader(profile, currentPage) {
     if (profile.role === "admin" && currentPage !== "manage") {
       links.push({ href: "admin.html", label: "Manage" });
     }
+    if ((profile.role === "admin" || profile.role === "inspector") && currentPage !== "comp-day") {
+      links.push({ href: "comp-day.html", label: "Comp day" });
+    }
     if (profile.role === "team_member" && currentPage !== "team") {
       links.push({ href: "team.html", label: "My team" });
     }

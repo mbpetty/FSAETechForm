@@ -15,7 +15,8 @@ Follow these steps once. After that, all inspectors share the same data with **l
 3. If you already ran an older version of 01, also run `sql/02_inspection_stations_migration.sql`
 4. Run `sql/03_auth.sql` for login, roles, and row-level security
 5. Run `sql/04_user_delete.sql` so admins can delete users from Manage → Users
-6. Ignore warnings about realtime publication if the table is already listed
+6. Run `sql/05_attribution_and_rls.sql` for inspector attribution on results, pending-user lockdown, and competition delete support
+7. Ignore warnings about realtime publication if the table is already listed
 
 ## 3. Configure email to send a login code (required for shared tablets)
 

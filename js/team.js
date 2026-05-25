@@ -57,6 +57,10 @@ async function renderTeamView(profile) {
           : status === "pass" && result?.comment
             ? `<p class="team-item-comment">${escapeHtml(result.comment)}</p>`
             : "";
+      const attribution = formatAttribution(result?.updated_by_name, result?.updated_at);
+      const attributionHtml = attribution
+        ? `<p class="team-item-meta">${escapeHtml(attribution)}</p>`
+        : "";
 
       return `
     <li class="inspection-item" data-status="${status}">
@@ -70,6 +74,7 @@ async function renderTeamView(profile) {
         <p>${escapeHtml(item.description)}</p>
       </details>
       ${comment}
+      ${attributionHtml}
     </li>
   `;
     })

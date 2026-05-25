@@ -281,6 +281,12 @@
   line-height: 1.4;
 }
 
+.team-item-meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
 .user-request-card {
   background: var(--surface);
   border: 1px solid var(--border);

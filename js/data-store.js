@@ -13,6 +13,40 @@ let resultsChannel = null;
 let dashboardChannel = null;
 let competitionAssignmentsCache = null;
 
+async function assertApprovedForDataAccess() {
+  const {
+    data: { session },
+  } = await getSupabase().auth.getSession();
+  if (!session) return;
+
+  const { data: profile, error } = await getSupabase()
+    .from("profiles")
+    .select("status")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  throwIfError(error, "check access");
+
+  if (!profile || profile.status !== "approved") {
+    throw new Error("Your account is awaiting admin approval.");
+  }
+}
+
+function formatAttribution(updatedByName, updatedAt) {
+  if (!updatedByName && !updatedAt) return "";
+  const when = updatedAt ? new Date(updatedAt).toLocaleString() : "";
+  if (updatedByName && when) return `Updated by ${updatedByName} · ${when}`;
+  if (updatedByName) return `Updated by ${updatedByName}`;
+  return when;
+}
+
+function exportUrl(teamId, competitionId, from = "") {
+  const params = new URLSearchParams({ team: teamId });
+  if (competitionId && competitionId !== "all") params.set("competition", competitionId);
+  if (from) params.set("from", from);
+  return `export.html?${params.toString()}`;
+}
+
 function slugify(value) {
   return String(value)
     .toLowerCase()
@@ -232,6 +266,8 @@ function getAllStationNames() {
 async function loadCompetitions() {
   if (competitionsCache) return competitionsCache;
 
+  await assertApprovedForDataAccess();
+
   const { data, error } = await getSupabase()
     .from("competitions")
     .select("id, label")
@@ -269,6 +305,8 @@ async function createCompetition(label, idOverride) {
 
 async function loadInspections() {
   if (inspectionsCache) return inspectionsCache;
+
+  await assertApprovedForDataAccess();
 
   const { data, error } = await getSupabase()
     .from("inspection_items")
@@ -310,6 +348,8 @@ function getStations(competitionId = "all") {
 
 async function loadCompetitionAssignments() {
   if (competitionAssignmentsCache) return competitionAssignmentsCache;
+
+  await assertApprovedForDataAccess();
 
   if (!dbSchema.hasCompetitionInspections) {
     competitionAssignmentsCache = new Map();
@@ -465,6 +505,8 @@ async function deleteInspection(key) {
 async function loadTeams() {
   if (teamsCache) return teamsCache;
 
+  await assertApprovedForDataAccess();
+
   const { data, error } = await getSupabase()
     .from("teams")
     .select("*")
@@ -521,10 +563,27 @@ async function deleteTeam(id) {
   return getTeams();
 }
 
+async function deleteCompetition(id) {
+  const { error } = await getSupabase().from("competitions").delete().eq("id", id);
+
+  if (error?.code === "23503") {
+    throw new Error(
+      "Cannot delete this competition — teams are still assigned to it. Move or delete those teams first."
+    );
+  }
+
+  throwIfError(error, "delete competition");
+  competitionsCache = null;
+  invalidateAssignmentCache();
+  return loadCompetitions();
+}
+
 async function fetchTeamResults(teamId) {
+  await assertApprovedForDataAccess();
+
   const { data, error } = await getSupabase()
     .from("inspection_results")
-    .select("item_key, status, comment")
+    .select("item_key, status, comment, updated_by_name, updated_at")
     .eq("team_id", teamId);
 
   throwIfError(error, "load team results");
@@ -534,9 +593,11 @@ async function fetchTeamResults(teamId) {
 async function fetchResultsForTeamIds(teamIds) {
   if (!teamIds.length) return [];
 
+  await assertApprovedForDataAccess();
+
   const { data, error } = await getSupabase()
     .from("inspection_results")
-    .select("team_id, item_key, status, comment")
+    .select("team_id, item_key, status, comment, updated_by_name, updated_at")
     .in("team_id", teamIds);
 
   throwIfError(error, "load team results");
@@ -550,12 +611,16 @@ function groupResultsByTeam(rows) {
     byTeam.get(row.team_id).set(row.item_key, {
       status: row.status,
       comment: row.comment ?? "",
+      updatedByName: row.updated_by_name ?? "",
+      updatedAt: row.updated_at ?? null,
     });
   }
   return byTeam;
 }
 
-async function saveInspectionResult(teamId, itemKey, status, comment = "") {
+async function saveInspectionResult(teamId, itemKey, status, comment = "", inspector = null) {
+  await assertApprovedForDataAccess();
+
   if (status === "pending") {
     const { error } = await getSupabase()
       .from("inspection_results")
@@ -567,15 +632,22 @@ async function saveInspectionResult(teamId, itemKey, status, comment = "") {
     return;
   }
 
-  const { error } = await getSupabase().from("inspection_results").upsert(
-    {
-      team_id: teamId,
-      item_key: itemKey,
-      status,
-      comment: comment ?? "",
-    },
-    { onConflict: "team_id,item_key" }
-  );
+  const profile =
+    inspector ||
+    (typeof getCurrentProfile === "function" ? getCurrentProfile() : null);
+
+  const payload = {
+    team_id: teamId,
+    item_key: itemKey,
+    status,
+    comment: comment ?? "",
+    updated_by: profile?.id ?? null,
+    updated_by_name: profile?.fullName || profile?.email || "",
+  };
+
+  const { error } = await getSupabase().from("inspection_results").upsert(payload, {
+    onConflict: "team_id,item_key",
+  });
 
   throwIfError(error, "save result");
 }

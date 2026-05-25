@@ -478,6 +478,7 @@ function renderCompetitionList() {
         </div>
         <div class="admin-list-actions">
           ${assignButtons}
+          <button type="button" class="btn-icon btn-icon--danger btn-delete-competition">Delete</button>
         </div>
       </div>
     </li>
@@ -518,6 +519,38 @@ function renderCompetitionList() {
       });
     });
   }
+
+  list.querySelectorAll(".btn-delete-competition").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.closest(".admin-list-item").dataset.competitionId;
+      const label = getCompetitionLabel(id);
+      const teamsInComp = getTeams().filter((t) => t.competition === id);
+      if (teamsInComp.length) {
+        showToast(
+          `Cannot delete "${label}" — ${teamsInComp.length} team(s) still assigned. Move or delete them first.`,
+          true
+        );
+        return;
+      }
+      if (
+        !confirm(
+          `Delete competition "${label}"?\n\nThis removes the competition and its inspection assignments. This cannot be undone.`
+        )
+      ) {
+        return;
+      }
+      try {
+        await deleteCompetition(id);
+        if (activeAssignCompetitionId === id) {
+          closeAssignmentPanel();
+        }
+        renderCompetitionList();
+        showToast(`Deleted ${label}.`);
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+  });
 }
 
 function renderAssignmentChecklist() {

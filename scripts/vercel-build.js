@@ -4,7 +4,7 @@ const path = require("path");
 const root = path.join(__dirname, "..");
 const out = path.join(root, "public");
 
-const COPY_DIRS = ["css", "js", "templates", "JuneInspectionList2026"];
+const COPY_DIRS = ["css", "js", "templates", "JuneInspectionList2026", "docs"];
 const SKIP_NAMES = new Set(["supabase-config.js", "node_modules", ".git", "public"]);
 
 function copyDir(src, dest) {

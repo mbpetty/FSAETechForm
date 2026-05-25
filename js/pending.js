@@ -33,14 +33,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   detail.textContent = `${profile.fullName || profile.email} · Requested: ${getRoleLabel(profile.requestedRole)}`;
 
   if (profile.requestedRole === "team_member" && profile.requestedTeamId) {
-    try {
-      await loadTeams();
-      const team = getTeams().find((t) => t.id === profile.requestedTeamId);
-      if (team) {
-        detail.textContent += ` · Team #${team.carNumber} ${team.teamName}`;
-      }
-    } catch {
-      /* ignore */
-    }
+    detail.textContent += " · Team assignment pending approval";
   }
 });

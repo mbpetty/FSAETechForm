@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Comp day cheat sheet — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <style>
+      .comp-day {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 1rem 1rem 2rem;
+      }
+      .comp-day h1 {
+        margin: 0 0 0.25rem;
+        font-size: 1.35rem;
+      }
+      .comp-day .lead {
+        margin: 0 0 1.25rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      }
+      .comp-day h2 {
+        margin: 1.25rem 0 0.5rem;
+        font-size: 0.95rem;
+      }
+      .comp-day p,
+      .comp-day li {
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+      .comp-day ol,
+      .comp-day ul {
+        margin: 0.25rem 0 0.75rem;
+        padding-left: 1.25rem;
+      }
+      .comp-day table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+        margin: 0.5rem 0 1rem;
+      }
+      .comp-day th,
+      .comp-day td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.5rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      .comp-day th {
+        background: #f8fafc;
+      }
+      .comp-day code {
+        font-size: 0.78rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header app-header--row">
+        <h1>Comp day cheat sheet</h1>
+        <nav class="header-nav" aria-label="App views"></nav>
+      </header>
+
+      <main class="comp-day">
+        <p class="lead">Bookmark this page for inspection day. Replace <code>YOUR-APP.vercel.app</code> with your Vercel URL.</p>
+
+        <h2>URLs (production)</h2>
+        <table>
+          <thead><tr><th>Who</th><th>Link</th></tr></thead>
+          <tbody>
+            <tr><td>Log in (tablets)</td><td><a href="login.html">login.html</a></td></tr>
+            <tr><td>Inspector</td><td><a href="index.html">index.html</a></td></tr>
+            <tr><td>Organizer dashboard</td><td><a href="dashboard.html">dashboard.html</a></td></tr>
+            <tr><td>Admin / manage</td><td><a href="admin.html">admin.html</a></td></tr>
+            <tr><td>Team read-only</td><td><a href="team.html">team.html</a></td></tr>
+            <tr><td>Sign up</td><td><a href="signup.html">signup.html</a></td></tr>
+          </tbody>
+        </table>
+
+        <h2>Before cars arrive (admin)</h2>
+        <ol>
+          <li>Log in as admin → Manage</li>
+          <li>Inspections — checklist uploaded</li>
+          <li>Teams — all cars loaded</li>
+          <li>Competitions — inspections assigned (e.g. June EV)</li>
+          <li>Users — approve inspectors and team members</li>
+          <li>Open dashboard — confirm teams appear</li>
+        </ol>
+
+        <h2>Inspector workflow (tablet)</h2>
+        <ol>
+          <li>Log in → enter email → type <strong>8-digit code</strong> (not the email link)</li>
+          <li>Select competition → team (car #)</li>
+          <li>Filter by station if needed</li>
+          <li>Pass / Fail each item (tap again to clear)</li>
+          <li>Add comment after pass/fail; tap Save</li>
+          <li>“Live sync on” = other inspectors see updates for this team</li>
+        </ol>
+        <p><strong>Important:</strong> Pass/fail only saves when a specific team is selected (not “All teams”).</p>
+
+        <h2>Organizer workflow</h2>
+        <ol>
+          <li>Dashboard — all teams, progress bars, failures</li>
+          <li>Filter by competition / status</li>
+          <li>Show failures on a team card for details</li>
+          <li>Inspect — jump to that team in the inspector view</li>
+          <li>Export PDF — from dashboard or inspector when a team is selected</li>
+        </ol>
+
+        <h2>Team member workflow</h2>
+        <ol>
+          <li>Sign up → wait for admin approval</li>
+          <li>After approval, log in → My team (read-only status + comments)</li>
+          <li>Pending users cannot see inspection data until approved</li>
+        </ol>
+
+        <h2>Approving new users (admin)</h2>
+        <ol>
+          <li>Manage → Users tab</li>
+          <li>Pending — Approve as Inspector / Team member / Admin</li>
+          <li>Team members: must pick a team before Approve</li>
+          <li>Delete — remove test accounts</li>
+        </ol>
+
+        <h2>If something breaks</h2>
+        <table>
+          <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td>Can't log in</td><td>New 8-digit code; check spam</td></tr>
+            <tr><td>Awaiting approval</td><td>Admin → Users → Approve</td></tr>
+            <tr><td>Pending user sees data</td><td>Run <code>sql/05_attribution_and_rls.sql</code> in Supabase</td></tr>
+            <tr><td>Empty inspection list</td><td>Admin → Competitions → assign inspections</td></tr>
+            <tr><td>Can't delete competition</td><td>Remove or reassign teams first</td></tr>
+            <tr><td>No live sync</td><td>Select a team; check venue internet</td></tr>
+            <tr><td>PDF blank</td><td>Select a team first, then Export PDF</td></tr>
+          </tbody>
+        </table>
+
+        <h2>SQL migrations (run once, in order)</h2>
+        <ol>
+          <li><code>sql/01_schema.sql</code></li>
+          <li><code>sql/02_inspection_stations_migration.sql</code> (if upgrading)</li>
+          <li><code>sql/03_auth.sql</code></li>
+          <li><code>sql/04_user_delete.sql</code></li>
+          <li><code>sql/05_attribution_and_rls.sql</code></li>
+        </ol>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const profile = await requireAuth({ roles: ["admin", "inspector"] });
+        if (!profile) return;
+        renderAuthHeader(profile, "comp-day");
+      });
+    </script>
+  </body>
+</html>

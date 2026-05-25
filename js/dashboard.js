@@ -200,6 +200,7 @@ function renderTeamList() {
       </div>
       <div class="team-card-actions">
         <a class="btn-dashboard btn-dashboard--primary" href="${inspectorUrl(competitionId, team.id)}">Inspect</a>
+        <a class="btn-dashboard" href="${exportUrl(team.id, competitionId)}">Export PDF</a>
         ${
           stats.fail > 0
             ? `<button type="button" class="btn-dashboard btn-toggle-failures" data-expanded="${expanded}">${expanded ? "Hide failures" : "Show failures"}</button>`

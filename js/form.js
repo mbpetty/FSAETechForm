@@ -50,6 +50,11 @@ async function setResult(key, result) {
 
   try {
     await saveInspectionResult(teamId, key, newResult, entry.comment);
+    const profile = getCurrentProfile();
+    entry.updatedByName = profile?.fullName || profile?.email || "";
+    entry.updatedAt = new Date().toISOString();
+    state.set(key, entry);
+    updateCardUI(key);
     setSyncStatus(true);
   } catch (err) {
     showInspectorToast(`Could not save: ${err.message}`, true);
@@ -74,6 +79,11 @@ async function submitComment(key, card) {
   try {
     if (entry.result === "pass" || entry.result === "fail") {
       await saveInspectionResult(teamId, key, entry.result, comment);
+      const profile = getCurrentProfile();
+      entry.updatedByName = profile?.fullName || profile?.email || "";
+      entry.updatedAt = new Date().toISOString();
+      state.set(key, entry);
+      updateCardUI(key);
     }
 
     btn.disabled = true;
@@ -162,6 +172,8 @@ async function loadResultsIntoState(teamId) {
     state.set(row.item_key, {
       result: row.status,
       comment: row.comment || "",
+      updatedByName: row.updated_by_name || "",
+      updatedAt: row.updated_at || null,
     });
   }
 
@@ -280,6 +292,14 @@ function updateCardUI(key) {
   comment.classList.toggle("is-required", result === "fail");
   comment.placeholder =
     result === "fail" ? "Required — describe failure…" : "Optional note…";
+
+  const attributionEl = card.querySelector(".item-attribution");
+  if (attributionEl) {
+    const entry = state.get(key);
+    const text = formatAttribution(entry?.updatedByName, entry?.updatedAt);
+    attributionEl.textContent = text;
+    attributionEl.hidden = !text;
+  }
 }
 
 function renderList() {
@@ -311,6 +331,7 @@ function renderList() {
         <summary class="description-toggle">Hide description</summary>
         <p>${escapeHtml(item.description)}</p>
       </details>
+      <p class="item-attribution" hidden></p>
       <div class="comment-block" hidden>
         <div class="comment-row">
           <input type="text" class="comment-input" autocomplete="off" placeholder="Optional note…" value="${escapeHtml(savedComment)}" />
@@ -379,6 +400,23 @@ function applyFilters() {
   document.getElementById("empty-state").textContent = noAssignments
     ? "No inspections assigned to this competition yet. Assign them in Admin → Competitions."
     : "No inspections match these filters.";
+
+  updateExportLink();
+}
+
+function updateExportLink() {
+  const btn = document.getElementById("export-pdf-btn");
+  if (!btn) return;
+
+  const teamId = getSelectedTeamId();
+  const competition = document.getElementById("filter-competition").value;
+  if (!isTeamSelected()) {
+    btn.hidden = true;
+    return;
+  }
+
+  btn.hidden = false;
+  btn.href = exportUrl(teamId, competition, "inspector");
 }
 
 async function applyUrlParams() {
