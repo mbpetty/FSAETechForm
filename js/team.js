@@ -71,7 +71,7 @@ async function renderTeamView(profile) {
       </div>
       <details class="item-description" open>
         <summary class="description-toggle">Hide description</summary>
-        <p>${escapeHtml(item.description)}</p>
+        <div class="rich-content item-description-body"></div>
       </details>
       ${comment}
       ${attributionHtml}
@@ -79,6 +79,13 @@ async function renderTeamView(profile) {
   `;
     })
     .join("");
+
+  list.querySelectorAll(".inspection-item").forEach((card, index) => {
+    const item = items[index];
+    if (!item) return;
+    const body = card.querySelector(".item-description-body");
+    if (body) mountDescriptionContent(body, item.description);
+  });
 
   list.querySelectorAll(".item-description").forEach((details) => {
     const toggle = details.querySelector(".description-toggle");

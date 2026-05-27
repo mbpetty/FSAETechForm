@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FAQ — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <style>
+      .faq-page {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 1rem 1rem 2rem;
+      }
+      .faq-page h1 {
+        margin: 0 0 0.25rem;
+        font-size: 1.35rem;
+      }
+      .faq-page .lead {
+        margin: 0 0 1.25rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      }
+      .faq-page h2 {
+        margin: 1.25rem 0 0.5rem;
+        font-size: 0.95rem;
+      }
+      .faq-page p,
+      .faq-page li {
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+      .faq-page ol,
+      .faq-page ul {
+        margin: 0.25rem 0 0.75rem;
+        padding-left: 1.25rem;
+      }
+      .faq-page table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+        margin: 0.5rem 0 1rem;
+      }
+      .faq-page th,
+      .faq-page td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.5rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      .faq-page th {
+        background: #f8fafc;
+      }
+      .faq-page code {
+        font-size: 0.78rem;
+      }
+      .public-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.65rem;
+        align-items: center;
+        margin-left: auto;
+      }
+      .public-nav a {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.92);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header app-header--row">
+        <h1>FAQ</h1>
+        <nav class="public-nav" aria-label="Site links">
+          <a href="login.html">Log in</a>
+          <a href="signup.html">Sign up</a>
+        </nav>
+      </header>
+
+      <main class="faq-page">
+        <p class="lead">Quick reference for inspection day. Site: <a href="https://fsaetechform.com/login.html">fsaetechform.com</a></p>
+
+        <h2>URLs</h2>
+        <table>
+          <thead><tr><th>Who</th><th>Link</th></tr></thead>
+          <tbody>
+            <tr><td>Log in (tablets)</td><td><a href="https://fsaetechform.com/login.html">fsaetechform.com/login.html</a></td></tr>
+            <tr><td>Inspector</td><td><a href="https://fsaetechform.com/index.html">fsaetechform.com/index.html</a></td></tr>
+            <tr><td>Dashboard</td><td><a href="https://fsaetechform.com/dashboard.html">fsaetechform.com/dashboard.html</a></td></tr>
+            <tr><td>Admin</td><td><a href="https://fsaetechform.com/admin.html">fsaetechform.com/admin.html</a></td></tr>
+            <tr><td>Team view</td><td><a href="https://fsaetechform.com/team.html">fsaetechform.com/team.html</a></td></tr>
+            <tr><td>Sign up</td><td><a href="https://fsaetechform.com/signup.html">fsaetechform.com/signup.html</a></td></tr>
+          </tbody>
+        </table>
+
+        <h2>Before cars arrive (admin)</h2>
+        <ol>
+          <li>Log in as admin → Admin</li>
+          <li>Inspections — checklist uploaded</li>
+          <li>Teams — all cars loaded</li>
+          <li>Competitions — inspections assigned</li>
+          <li>Users — approve or invite inspectors and team members</li>
+          <li>Dashboard — confirm teams appear</li>
+        </ol>
+
+        <h2>Inspector workflow (tablet)</h2>
+        <ol>
+          <li>Log in → enter email → type <strong>8-digit code</strong> (not the email link)</li>
+          <li>Select competition → team (car #)</li>
+          <li>Pass / Fail each item (tap again to clear)</li>
+          <li>Add comment after pass/fail; tap Save</li>
+          <li>“Live sync on” = other inspectors see updates for this team</li>
+        </ol>
+
+        <h2>Organizer workflow</h2>
+        <ol>
+          <li>Dashboard — progress bars and failures</li>
+          <li>Export PDF — from dashboard or inspector when a team is selected</li>
+        </ol>
+
+        <h2>Team members</h2>
+        <ol>
+          <li>Sign up → wait for admin approval</li>
+          <li>After approval, log in → My team (read-only)</li>
+        </ol>
+
+        <h2>Troubleshooting</h2>
+        <table>
+          <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td>Can't log in</td><td>Request a new code; check spam</td></tr>
+            <tr><td>Awaiting approval</td><td>Admin → Users → Approve</td></tr>
+            <tr><td>Empty inspection list</td><td>Admin → Competitions → assign inspections</td></tr>
+            <tr><td>No live sync</td><td>Select a team; check internet</td></tr>
+          </tbody>
+        </table>
+      </main>
+    </div>
+  </body>
+</html>

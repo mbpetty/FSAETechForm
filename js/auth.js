@@ -214,11 +214,11 @@ function renderAuthHeader(profile, currentPage) {
         links.push({ href: "dashboard.html", label: "Dashboard" });
       }
     }
-    if (profile.role === "admin" && currentPage !== "manage") {
-      links.push({ href: "admin.html", label: "Manage" });
+    if (profile.role === "admin" && currentPage !== "admin") {
+      links.push({ href: "admin.html", label: "Admin" });
     }
-    if ((profile.role === "admin" || profile.role === "inspector") && currentPage !== "comp-day") {
-      links.push({ href: "comp-day.html", label: "Comp day" });
+    if (currentPage !== "faq") {
+      links.push({ href: "faq.html", label: "FAQ" });
     }
     if (profile.role === "team_member" && currentPage !== "team") {
       links.push({ href: "team.html", label: "My team" });

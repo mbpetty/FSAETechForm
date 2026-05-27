@@ -329,7 +329,7 @@ function renderList() {
       </div>
       <details class="item-description" open>
         <summary class="description-toggle">Hide description</summary>
-        <p>${escapeHtml(item.description)}</p>
+        <div class="rich-content item-description-body"></div>
       </details>
       <p class="item-attribution" hidden></p>
       <div class="comment-block" hidden>
@@ -340,6 +340,9 @@ function renderList() {
         <span class="save-status" role="status"${commentSaved ? "" : " hidden"}>${commentSaved ? "Comment saved" : ""}</span>
       </div>
     `;
+
+    const descriptionBody = li.querySelector(".item-description-body");
+    mountDescriptionContent(descriptionBody, item.description);
 
     const descriptionDetails = li.querySelector(".item-description");
     const descriptionToggle = li.querySelector(".description-toggle");

@@ -150,14 +150,14 @@ function renderTeamList() {
   if (!teams.length) {
     list.hidden = true;
     empty.hidden = false;
-    empty.textContent = "No teams in this competition yet. Add teams in Manage.";
+    empty.textContent = "No teams in this competition yet. Add teams in Admin.";
     return;
   }
 
   if (!requiredItems.length) {
     list.hidden = true;
     empty.hidden = false;
-    empty.textContent = "No inspections assigned to this competition. Assign them in Manage → Competitions.";
+    empty.textContent = "No inspections assigned to this competition. Assign them in Admin → Competitions.";
     return;
   }
 

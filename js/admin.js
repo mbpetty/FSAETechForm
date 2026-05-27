@@ -4,6 +4,14 @@ function escapeHtml(text) {
   return el.innerHTML;
 }
 
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
 function showToast(message, isError = false) {
   const el = document.getElementById("admin-toast");
   el.textContent = message;
@@ -63,7 +71,9 @@ function switchTab(tab) {
   document.getElementById("panel-teams").hidden = tab !== "teams";
   document.getElementById("panel-competitions").hidden = tab !== "competitions";
   document.getElementById("panel-users").hidden = tab !== "users";
+  document.getElementById("panel-activity").hidden = tab !== "activity";
   if (tab === "users") renderUsersPanel();
+  if (tab === "activity") renderActivityLog(true);
 }
 
 function getStationOptions() {
@@ -129,7 +139,7 @@ function renderInspectionList() {
           <button type="button" class="btn-icon btn-icon--danger btn-delete-inspection">Delete</button>
         </div>
       </div>
-      <p class="admin-list-preview">${escapeHtml(item.description)}</p>
+      <p class="admin-list-preview">${escapeHtml(stripDescriptionHtml(item.description).slice(0, 160))}${stripDescriptionHtml(item.description).length > 160 ? "…" : ""}</p>
     </li>
   `
     )
@@ -176,7 +186,7 @@ function openInspectionForm(item = null) {
   }
 
   document.getElementById("inspection-title").value = item?.title ?? "";
-  document.getElementById("inspection-description").value = item?.description ?? "";
+  initDescriptionEditor(item?.description ?? "");
 
   selectedStations = new Set(item?.stations ?? []);
   customStations = item?.stations ? [...item.stations] : [];
@@ -187,6 +197,7 @@ function openInspectionForm(item = null) {
 
 function closeInspectionForm() {
   document.getElementById("inspection-form").hidden = true;
+  destroyDescriptionEditor();
   selectedStations.clear();
 }
 
@@ -478,6 +489,7 @@ function renderCompetitionList() {
         </div>
         <div class="admin-list-actions">
           ${assignButtons}
+          <button type="button" class="btn-icon btn-edit-competition">Edit</button>
           <button type="button" class="btn-icon btn-icon--danger btn-delete-competition">Delete</button>
         </div>
       </div>
@@ -519,6 +531,13 @@ function renderCompetitionList() {
       });
     });
   }
+
+  list.querySelectorAll(".btn-edit-competition").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.closest(".admin-list-item").dataset.competitionId;
+      openCompetitionForm(getCompetitions().find((c) => c.id === id));
+    });
+  });
 
   list.querySelectorAll(".btn-delete-competition").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -613,15 +632,117 @@ function closeAssignmentPanel() {
   assignSelectedIds.clear();
 }
 
-function openCompetitionForm() {
-  document.getElementById("competition-form").hidden = false;
-  document.getElementById("competition-label").value = "";
-  document.getElementById("competition-id").value = "";
-  document.getElementById("competition-form").scrollIntoView({ behavior: "smooth", block: "nearest" });
+let activityLogOffset = 0;
+const ACTIVITY_PAGE_SIZE = 50;
+let activityLogHasMore = false;
+
+function formatActivityTime(iso) {
+  return new Date(iso).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+async function renderActivityLog(reset = false) {
+  const list = document.getElementById("activity-log-list");
+  const empty = document.getElementById("activity-log-empty");
+  const loadMore = document.getElementById("activity-load-more-btn");
+  const category = document.getElementById("activity-filter-category").value;
+  const search = document.getElementById("activity-filter-search").value.trim();
+
+  if (reset) {
+    activityLogOffset = 0;
+    list.innerHTML = "";
+  }
+
+  try {
+    const rows = await fetchActivityLog({
+      category: category || null,
+      search: search || null,
+      limit: ACTIVITY_PAGE_SIZE,
+      offset: activityLogOffset,
+    });
+
+    activityLogHasMore = rows.length === ACTIVITY_PAGE_SIZE;
+
+    if (!rows.length && activityLogOffset === 0) {
+      empty.hidden = false;
+      empty.textContent = search || category
+        ? "No activity matches these filters."
+        : "No activity yet. Run sql/07_feedback_features.sql to enable logging.";
+      loadMore.hidden = true;
+      return;
+    }
+
+    empty.hidden = true;
+    list.insertAdjacentHTML(
+      "beforeend",
+      rows
+        .map(
+          (row) => `
+      <li class="activity-log-item">
+        <div class="activity-log-head">
+          <span class="activity-log-time">${escapeHtml(formatActivityTime(row.createdAt))}</span>
+          <span class="activity-log-badges">
+            <span class="activity-badge activity-badge--category">${escapeHtml(row.category)}</span>
+            <span class="activity-badge">${escapeHtml(row.action)}</span>
+          </span>
+        </div>
+        <p class="activity-log-summary">${escapeHtml(row.summary)}</p>
+        <p class="activity-log-actor">${escapeHtml(row.actorName)}</p>
+      </li>
+    `
+        )
+        .join("")
+    );
+
+    activityLogOffset += rows.length;
+    loadMore.hidden = !activityLogHasMore;
+  } catch (err) {
+    empty.hidden = false;
+    empty.textContent = err.message;
+    loadMore.hidden = true;
+  }
+}
+
+function openAddUserForm() {
+  document.getElementById("add-user-form").hidden = false;
+  document.getElementById("invite-email").value = "";
+  document.getElementById("invite-name").value = "";
+  document.getElementById("invite-role").value = "inspector";
+  document.getElementById("invite-team").innerHTML = teamOptionsHtml();
+  document.getElementById("invite-team-wrap").hidden = true;
+  document.getElementById("invite-auto-approve").checked = true;
+}
+
+function closeAddUserForm() {
+  document.getElementById("add-user-form").hidden = true;
+}
+
+function openCompetitionForm(competition = null) {
+  const form = document.getElementById("competition-form");
+  const isEdit = Boolean(competition);
+
+  form.hidden = false;
+  document.getElementById("competition-form-title").textContent = isEdit
+    ? "Edit competition"
+    : "New competition";
+  document.getElementById("competition-submit-btn").textContent = isEdit
+    ? "Save changes"
+    : "Create competition";
+  document.getElementById("competition-edit-id").value = competition?.id ?? "";
+  document.getElementById("competition-label").value = competition?.label ?? "";
+  document.getElementById("competition-id").value = competition?.id ?? "";
+  document.getElementById("competition-id-wrap").hidden = isEdit;
+  document.getElementById("competition-id").disabled = isEdit;
+  form.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 function closeCompetitionForm() {
   document.getElementById("competition-form").hidden = true;
+  document.getElementById("competition-edit-id").value = "";
+  document.getElementById("competition-id").disabled = false;
+  document.getElementById("competition-id-wrap").hidden = false;
 }
 
 async function handleInspectionCsvFile(file) {
@@ -660,7 +781,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!profile) return;
 
   currentAdminProfileId = profile.id;
-  renderAuthHeader(profile, "manage");
+  renderAuthHeader(profile, "admin");
 
   document.querySelectorAll(".admin-tab").forEach((btn) => {
     btn.addEventListener("click", () => switchTab(btn.dataset.tab));
@@ -705,9 +826,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const payload = {
       title: document.getElementById("inspection-title").value.trim(),
-      description: document.getElementById("inspection-description").value.trim(),
+      description: getDescriptionEditorHtml(),
       stations,
     };
+
+    if (!payload.title || !stripDescriptionHtml(payload.description)) {
+      showToast("Title and description are required.", true);
+      return;
+    }
 
     if (existing) payload.itemId = existing.itemId;
 
@@ -761,21 +887,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     handleTeamCsvFile(e.target.files[0]);
   });
 
-  document.getElementById("add-competition-btn").addEventListener("click", openCompetitionForm);
+  document.getElementById("add-competition-btn").addEventListener("click", () => openCompetitionForm());
   document.getElementById("cancel-competition-btn").addEventListener("click", closeCompetitionForm);
 
   document.getElementById("competition-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const label = document.getElementById("competition-label").value.trim();
+    const editId = document.getElementById("competition-edit-id").value.trim();
     const id = document.getElementById("competition-id").value.trim();
 
     try {
-      await createCompetition(label, id || undefined);
+      if (editId) {
+        await updateCompetition(editId, label);
+        showToast("Competition updated.");
+      } else {
+        await createCompetition(label, id || undefined);
+        showToast("Competition created.");
+      }
       await fillTeamCompetitionSelect();
       await loadCompetitionAssignments();
       renderCompetitionList();
       closeCompetitionForm();
-      showToast("Competition created.");
     } catch (err) {
       showToast(err.message, true);
     }
@@ -806,4 +938,53 @@ document.addEventListener("DOMContentLoaded", async () => {
       showToast(err.message, true);
     }
   });
+
+  document.getElementById("toggle-add-user-btn").addEventListener("click", () => {
+    const form = document.getElementById("add-user-form");
+    if (form.hidden) openAddUserForm();
+    else closeAddUserForm();
+  });
+
+  document.getElementById("cancel-add-user-btn").addEventListener("click", closeAddUserForm);
+
+  document.getElementById("invite-role").addEventListener("change", () => {
+    document.getElementById("invite-team-wrap").hidden =
+      document.getElementById("invite-role").value !== "team_member";
+  });
+
+  document.getElementById("add-user-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("invite-email").value.trim();
+    const fullName = document.getElementById("invite-name").value.trim();
+    const role = document.getElementById("invite-role").value;
+    const teamId = document.getElementById("invite-team").value;
+    const autoApprove = document.getElementById("invite-auto-approve").checked;
+
+    if (role === "team_member" && !teamId) {
+      showToast("Select a team for team member invites.", true);
+      return;
+    }
+
+    try {
+      await adminInviteUser({ email, fullName, role, teamId: teamId || null, autoApprove });
+      closeAddUserForm();
+      showToast(`Invite sent to ${email}. They'll receive a login code by email.`);
+    } catch (err) {
+      showToast(err.message, true);
+    }
+  });
+
+  document.getElementById("activity-filter-category").addEventListener("change", () =>
+    renderActivityLog(true)
+  );
+  document.getElementById("activity-filter-search").addEventListener(
+    "input",
+    debounce(() => renderActivityLog(true), 300)
+  );
+  document.getElementById("activity-refresh-btn").addEventListener("click", () =>
+    renderActivityLog(true)
+  );
+  document.getElementById("activity-load-more-btn").addEventListener("click", () =>
+    renderActivityLog(false)
+  );
 });

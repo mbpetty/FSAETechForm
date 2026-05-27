@@ -87,7 +87,7 @@ async function renderExport() {
         <td class="col-id">${escapeHtml(item.itemId)}</td>
         <td>
           <strong>${escapeHtml(item.title)}</strong>
-          <div class="export-desc">${escapeHtml(item.description)}</div>
+          <div class="export-desc rich-content">${renderDescriptionHtml(item.description)}</div>
         </td>
         <td class="col-status ${statusClass(status)}">${statusLabel(status)}</td>
         <td class="col-comment">${hasVerdict ? exportCell(comment) : "—"}</td>

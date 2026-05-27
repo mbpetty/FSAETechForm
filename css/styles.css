@@ -429,7 +429,8 @@ body {
   transform: rotate(-45deg) translateY(1px);
 }
 
-.item-description p {
+.item-description p,
+.item-description .rich-content {
   margin: 0.25rem 0 0;
   padding: 0.5rem 0.6rem;
   line-height: 1.5;

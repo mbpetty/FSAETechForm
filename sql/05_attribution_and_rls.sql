@@ -26,11 +26,13 @@ $$;
 
 -- competitions
 drop policy if exists "competitions read approved" on public.competitions;
+drop policy if exists "competitions read directory" on public.competitions;
 create policy "competitions read directory" on public.competitions
   for select using (public.can_read_directory_tables());
 
 -- teams
 drop policy if exists "teams read approved" on public.teams;
+drop policy if exists "teams read directory" on public.teams;
 create policy "teams read directory" on public.teams
   for select using (public.can_read_directory_tables());
 

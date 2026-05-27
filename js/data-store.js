@@ -303,6 +303,20 @@ async function createCompetition(label, idOverride) {
   return loadCompetitions();
 }
 
+async function updateCompetition(id, label) {
+  const labelTrim = label.trim();
+  if (!labelTrim) throw new Error("Competition name is required.");
+
+  const { error } = await getSupabase()
+    .from("competitions")
+    .update({ label: labelTrim })
+    .eq("id", id);
+
+  throwIfError(error, "update competition");
+  competitionsCache = null;
+  return loadCompetitions();
+}
+
 async function loadInspections() {
   if (inspectionsCache) return inspectionsCache;
 
@@ -775,4 +789,80 @@ async function deleteUserAccount(profileId) {
   });
 
   throwIfError(error, "delete user");
+}
+
+async function fetchActivityLog({ category = null, search = null, limit = 50, offset = 0 } = {}) {
+  let query = getSupabase()
+    .from("activity_log")
+    .select("id, created_at, actor_id, actor_name, category, action, summary, metadata")
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (category) query = query.eq("category", category);
+  if (search) query = query.ilike("summary", `%${search}%`);
+
+  const { data, error } = await query;
+  throwIfError(error, "load activity log");
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    createdAt: row.created_at,
+    actorId: row.actor_id,
+    actorName: row.actor_name,
+    category: row.category,
+    action: row.action,
+    summary: row.summary,
+    metadata: row.metadata ?? {},
+  }));
+}
+
+async function adminInviteUser({ email, fullName, role, teamId = null, autoApprove = true }) {
+  const profile = typeof getCurrentProfile === "function" ? getCurrentProfile() : null;
+  const emailNorm = email.trim().toLowerCase();
+
+  if (!emailNorm || !fullName.trim()) {
+    throw new Error("Email and full name are required.");
+  }
+  if (role === "team_member" && !teamId) {
+    throw new Error("Select a team for team member invites.");
+  }
+
+  const { error: inviteError } = await getSupabase().from("admin_invites").upsert({
+    email: emailNorm,
+    full_name: fullName.trim(),
+    role,
+    team_id: role === "team_member" ? teamId : null,
+    auto_approve: autoApprove,
+    created_by: profile?.id ?? null,
+  });
+
+  if (inviteError?.code === "42P01") {
+    throw new Error("Run sql/07_feedback_features.sql in Supabase to enable user invites.");
+  }
+  throwIfError(inviteError, "save invite");
+
+  try {
+    await getSupabase().rpc("write_activity_log", {
+      p_category: "user",
+      p_action: "invite",
+      p_summary: `${profile?.fullName || profile?.email || "Admin"} invited ${emailNorm} as ${role}`,
+      p_metadata: { email: emailNorm, role, auto_approve: autoApprove },
+    });
+  } catch {
+    /* activity log optional until migration runs */
+  }
+
+  const { error } = await getSupabase().auth.signInWithOtp({
+    email: emailNorm,
+    options: {
+      shouldCreateUser: true,
+      data: {
+        full_name: fullName.trim(),
+        requested_role: role === "team_member" ? "team_member" : "inspector",
+        requested_team_id: teamId || "",
+      },
+    },
+  });
+
+  throwIfError(error, "send invite email");
 }

@@ -1,6 +1,6 @@
 # Comp-day cheat sheet — FSAE Tech Inspection
 
-Print or bookmark this page for inspection day. Replace `YOUR-APP.vercel.app` with your Vercel URL.
+Print or bookmark this page for inspection day. Production site: **https://fsaetechform.com**
 
 ---
 
@@ -8,20 +8,20 @@ Print or bookmark this page for inspection day. Replace `YOUR-APP.vercel.app` wi
 
 | Who | Link |
 |-----|------|
-| **Log in** (tablets) | https://YOUR-APP.vercel.app/login.html |
-| **Inspector** | https://YOUR-APP.vercel.app/index.html |
-| **Organizer dashboard** | https://YOUR-APP.vercel.app/dashboard.html |
-| **Admin / manage** | https://YOUR-APP.vercel.app/admin.html |
-| **Team read-only** | https://YOUR-APP.vercel.app/team.html |
-| **Sign up** (new users) | https://YOUR-APP.vercel.app/signup.html |
+| **Log in** (tablets) | https://fsaetechform.com/login.html |
+| **Inspector** | https://fsaetechform.com/index.html |
+| **Organizer dashboard** | https://fsaetechform.com/dashboard.html |
+| **Admin / manage** | https://fsaetechform.com/admin.html |
+| **Team read-only** | https://fsaetechform.com/team.html |
+| **Sign up** (new users) | https://fsaetechform.com/signup.html |
 
-Local testing: swap `YOUR-APP.vercel.app` → `localhost:8080` (same paths).
+Local testing: swap `fsaetechform.com` → `localhost:8080` (same paths).
 
 ---
 
 ## Before cars arrive (admin)
 
-1. Log in as **admin** → https://YOUR-APP.vercel.app/admin.html  
+1. Log in as **admin** → https://fsaetechform.com/admin.html  
 2. **Inspections** — checklist uploaded for the competition  
 3. **Teams** — all cars loaded  
 4. **Competitions** — inspections assigned to the correct comp (e.g. June EV)  

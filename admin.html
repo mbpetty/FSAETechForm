@@ -4,18 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#1e1b4b" />
-    <title>Manage — FSAE Tech Inspection</title>
+    <title>Admin — FSAE Tech Inspection</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/auth.css" />
     <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/admin-activity.css" />
+    <link rel="stylesheet" href="css/rich-text.css" />
   </head>
   <body>
     <div class="app admin-app">
       <header class="app-header app-header--row">
-        <h1>Manage data</h1>
+        <h1>Admin</h1>
         <nav class="header-nav" aria-label="App views"></nav>
       </header>
 
@@ -24,6 +27,7 @@
         <button type="button" class="admin-tab" data-tab="teams">Teams</button>
         <button type="button" class="admin-tab" data-tab="competitions">Competitions</button>
         <button type="button" class="admin-tab" data-tab="users">Users</button>
+        <button type="button" class="admin-tab" data-tab="activity">Activity log</button>
       </nav>
 
       <p id="admin-toast" class="admin-toast" hidden role="status"></p>
@@ -57,7 +61,9 @@
             </label>
             <label class="span-2">
               <span>Description</span>
-              <textarea id="inspection-description" rows="4" required></textarea>
+              <div id="inspection-description-editor"></div>
+              <textarea id="inspection-description-fallback" rows="4" hidden></textarea>
+              <span class="field-hint">Rich text and small images (max 512 KB each). Run sql/07_feedback_features.sql for image uploads.</span>
             </label>
             <div class="span-2">
               <span class="field-label">Stations / sections</span>
@@ -123,13 +129,14 @@
         </div>
 
         <form id="competition-form" class="admin-form" hidden>
-          <h3>New competition</h3>
+          <h3 id="competition-form-title">New competition</h3>
+          <input type="hidden" id="competition-edit-id" />
           <div class="form-grid">
             <label class="span-2">
               <span>Name</span>
               <input type="text" id="competition-label" required placeholder="e.g. FSAE Michigan — June" />
             </label>
-            <label class="span-2">
+            <label class="span-2" id="competition-id-wrap">
               <span>ID (optional)</span>
               <input type="text" id="competition-id" placeholder="Auto-generated from name if blank" />
               <span class="field-hint">Used in team CSV and filters. Lowercase with dashes, e.g. michigan-june</span>
@@ -137,7 +144,7 @@
           </div>
           <div class="form-actions">
             <button type="button" class="btn-secondary" id="cancel-competition-btn">Cancel</button>
-            <button type="submit" class="btn-primary">Create competition</button>
+            <button type="submit" class="btn-primary" id="competition-submit-btn">Create competition</button>
           </div>
         </form>
 
@@ -164,9 +171,45 @@
       <section id="panel-users" class="admin-panel" hidden>
         <div class="admin-toolbar">
           <h2>User access</h2>
+          <button type="button" class="btn-primary" id="toggle-add-user-btn">Add user</button>
         </div>
-        <p class="field-hint">Approve sign-up requests and assign roles. Only admins can manage users.</p>
-        <p class="field-hint">Testing with one Gmail? Use plus aliases: <code>you+inspector@gmail.com</code>, <code>you+team@gmail.com</code> — all arrive in the same inbox.</p>
+        <p class="field-hint">Approve sign-up requests, invite new users, and assign roles.</p>
+        <p class="field-hint">Testing with one Gmail? Use plus aliases: <code>you+inspector@gmail.com</code>, <code>you+team@gmail.com</code></p>
+
+        <form id="add-user-form" class="admin-form" hidden>
+          <h3>Invite user</h3>
+          <div class="form-grid">
+            <label class="span-2">
+              <span>Email</span>
+              <input type="email" id="invite-email" required placeholder="inspector@school.edu" />
+            </label>
+            <label class="span-2">
+              <span>Full name</span>
+              <input type="text" id="invite-name" required placeholder="Jane Inspector" />
+            </label>
+            <label>
+              <span>Role</span>
+              <select id="invite-role">
+                <option value="inspector">Inspector</option>
+                <option value="team_member">Team member</option>
+                <option value="admin">Admin</option>
+              </select>
+            </label>
+            <label id="invite-team-wrap" hidden>
+              <span>Team</span>
+              <select id="invite-team"></select>
+            </label>
+            <label class="span-2 invite-auto-approve">
+              <input type="checkbox" id="invite-auto-approve" checked />
+              <span>Approve automatically when they first log in</span>
+            </label>
+          </div>
+          <p class="field-hint">Sends an 8-digit login code to their email. They must verify once to activate the account.</p>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="cancel-add-user-btn">Cancel</button>
+            <button type="submit" class="btn-primary">Send invite</button>
+          </div>
+        </form>
 
         <h3 class="user-section-title">Pending approval</h3>
         <div id="pending-users-list"></div>
@@ -174,14 +217,46 @@
         <h3 class="user-section-title">Approved users</h3>
         <div id="approved-users-list"></div>
       </section>
+
+      <!-- Activity log -->
+      <section id="panel-activity" class="admin-panel" hidden>
+        <div class="admin-toolbar">
+          <h2>Activity log</h2>
+          <button type="button" class="btn-secondary btn-sm" id="activity-refresh-btn">Refresh</button>
+        </div>
+        <p class="field-hint">All changes to inspections, results, users, teams, and competitions.</p>
+        <div class="activity-filters">
+          <label>
+            <span>Category</span>
+            <select id="activity-filter-category">
+              <option value="">All categories</option>
+              <option value="inspection">Inspection results</option>
+              <option value="inspection_item">Inspection items</option>
+              <option value="user">Users</option>
+              <option value="team">Teams</option>
+              <option value="competition">Competitions</option>
+            </select>
+          </label>
+          <label>
+            <span>Search</span>
+            <input type="search" id="activity-filter-search" placeholder="Filter by summary text…" />
+          </label>
+        </div>
+        <ul id="activity-log-list" class="activity-log-list"></ul>
+        <p id="activity-log-empty" class="admin-empty" hidden>No activity matches these filters.</p>
+        <button type="button" class="btn-secondary btn-sm" id="activity-load-more-btn" hidden>Load more</button>
+      </section>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/csv-utils.js"></script>
     <script src="js/data-store.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/rich-text.js"></script>
     <script src="js/admin.js"></script>
   </body>
 </html>
