@@ -24,8 +24,9 @@ python3 -m http.server 8080
 | Inspector | http://localhost:8080/index.html |
 | Organizer dashboard | http://localhost:8080/dashboard.html |
 | Manage data | http://localhost:8080/admin.html |
-| Team view | http://localhost:8080/team.html |
-| Pending approval | http://localhost:8080/pending.html |
+| FAQ | http://localhost:8080/faq.html |
+
+**Email approval on signup:** [docs/EMAIL-APPROVAL-SETUP.md](docs/EMAIL-APPROVAL-SETUP.md) (Resend + Supabase Edge Functions)
 
 ## Deploy (Vercel)
 

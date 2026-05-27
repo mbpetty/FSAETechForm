@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Approve access — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+  </head>
+  <body>
+    <div class="app auth-page">
+      <header class="app-header">
+        <h1>Tech Inspection</h1>
+      </header>
+
+      <main class="auth-main">
+        <div class="auth-card">
+          <h2 id="approve-title">Processing…</h2>
+          <p id="approve-body">Please wait while we apply your decision.</p>
+          <p id="approve-detail" class="auth-hint" hidden></p>
+          <div class="auth-actions" id="approve-actions" hidden>
+            <a class="auth-btn auth-btn--primary" href="admin.html">Open Admin</a>
+            <a class="auth-btn auth-btn--secondary" href="faq.html">FAQ</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/approve.js"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+# Supabase project config (Edge Functions)
+
+[functions.notify-admin-signup]
+verify_jwt = false
+
+[functions.process-approval-link]
+verify_jwt = false
