@@ -10,3 +10,6 @@ node_modules/
 
 # Vercel build output
 public/
+
+# Supabase CLI local link cache
+supabase/.temp/
