@@ -89,7 +89,36 @@ async function sendLoginOtp(email) {
     email: email.trim().toLowerCase(),
     options: { shouldCreateUser: false },
   });
-  throwIfError(error, "send login code");
+
+  if (error) {
+    if (isUnknownUserLoginError(error)) {
+      throw Object.assign(new Error(formatLoginError(error)), { signupRequired: true });
+    }
+    throw new Error(error.message || "Could not send login code.");
+  }
+}
+
+function isUnknownUserLoginError(error) {
+  const msg = String(error?.message ?? "").toLowerCase();
+  const code = String(error?.code ?? "").toLowerCase();
+
+  return (
+    msg.includes("user not found") ||
+    msg.includes("not registered") ||
+    msg.includes("no user") ||
+    msg.includes("signups not allowed") ||
+    msg.includes("otp not available") ||
+    msg.includes("signup is disabled") ||
+    code === "otp_disabled"
+  );
+}
+
+function formatLoginError(error) {
+  if (isUnknownUserLoginError(error)) {
+    return "No account found for that email. Sign up first, then log in after an admin approves you.";
+  }
+
+  return error.message || "Could not send login code.";
 }
 
 async function sendSignupOtp(email, metadata) {
@@ -260,7 +289,15 @@ function bindOtpForm({ emailInputId, codeStepId, sendBtnId, verifyBtnId, onSend,
         false
       );
     } catch (err) {
-      showAuthMessage(err.message, true);
+      if (err.signupRequired) {
+        showAuthMessage(
+          'No account found for that email. <a href="signup.html">Sign up here</a>, then log in after an admin approves you.',
+          true,
+          { html: true }
+        );
+      } else {
+        showAuthMessage(err.message, true);
+      }
     } finally {
       sendBtn.disabled = false;
       sendBtn.textContent = "Send code";
@@ -292,10 +329,11 @@ function bindOtpForm({ emailInputId, codeStepId, sendBtnId, verifyBtnId, onSend,
   });
 }
 
-function showAuthMessage(message, isError = false) {
+function showAuthMessage(message, isError = false, { html = false } = {}) {
   const el = document.getElementById("auth-message");
   if (!el) return;
-  el.textContent = message;
+  if (html) el.innerHTML = message;
+  else el.textContent = message;
   el.classList.toggle("is-error", isError);
   el.hidden = !message;
 }

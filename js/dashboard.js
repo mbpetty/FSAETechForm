@@ -8,12 +8,7 @@ function escapeHtml(text) {
 }
 
 function sortTeams(teams) {
-  return [...teams].sort((a, b) => {
-    const na = parseInt(a.carNumber, 10);
-    const nb = parseInt(b.carNumber, 10);
-    if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
-    return a.carNumber.localeCompare(b.carNumber, undefined, { numeric: true });
-  });
+  return sortTeamsByCarNumber(teams);
 }
 
 function computeTeamStats(team, requiredItems, resultsMap) {
@@ -69,6 +64,18 @@ function getSelectedCompetitionId() {
 
 function getStatusFilter() {
   return document.getElementById("dashboard-status").value;
+}
+
+function getTeamFilter() {
+  return document.getElementById("dashboard-team").value;
+}
+
+function initDashboardTeamFilter() {
+  const competitionId = getSelectedCompetitionId();
+  const select = document.getElementById("dashboard-team");
+  const teams = getTeamsForCompetition(competitionId);
+
+  fillTeamSelect(select, teams, { selectedValue: select.value, includeAll: true });
 }
 
 function inspectorUrl(competitionId, teamId) {
@@ -132,6 +139,7 @@ function renderFailures(failures) {
 function renderTeamList() {
   const competitionId = getSelectedCompetitionId();
   const statusFilter = getStatusFilter();
+  const teamFilter = getTeamFilter();
   const requiredItems = getInspectionsForCompetition(competitionId);
   const teams = sortTeams(getTeamsForCompetition(competitionId));
 
@@ -140,9 +148,12 @@ function renderTeamList() {
     stats: computeTeamStats(team, requiredItems, resultsByTeam),
   }));
 
-  const filtered = teamsWithStats.filter(({ stats }) => matchesStatusFilter(stats, statusFilter));
+  const filtered = teamsWithStats.filter(({ team, stats }) => {
+    if (teamFilter !== "all" && team.id !== teamFilter) return false;
+    return matchesStatusFilter(stats, statusFilter);
+  });
 
-  renderSummary(teamsWithStats);
+  renderSummary(filtered);
 
   const list = document.getElementById("dashboard-team-list");
   const empty = document.getElementById("dashboard-empty");
@@ -181,7 +192,7 @@ function renderTeamList() {
       <div class="team-card-head">
         <div class="team-card-title-row">
           <div>
-            <h3 class="team-card-title">#${escapeHtml(team.carNumber)} — ${escapeHtml(team.teamName)}</h3>
+            <h3 class="team-card-title">${escapeHtml(formatTeamFilterLabel(team))}</h3>
             <p class="team-card-meta">${stats.pass} passed · ${stats.fail} failed · ${stats.pending} remaining</p>
           </div>
           <span class="team-status-pill team-status-pill--${stats.statusKey}">${escapeHtml(stats.statusLabel)}</span>
@@ -270,6 +281,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("dashboard-competition").addEventListener("change", async () => {
     expandedTeamIds.clear();
+    initDashboardTeamFilter();
     try {
       await refreshResults();
     } catch (err) {
@@ -278,6 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("dashboard-status").addEventListener("change", renderTeamList);
+  document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
 
   try {
     await detectDbSchema();
@@ -286,6 +299,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadTeams();
     await loadCompetitionAssignments();
     await initCompetitionFilter();
+    initDashboardTeamFilter();
     await refreshResults();
 
     loadEl.hidden = true;

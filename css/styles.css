@@ -159,6 +159,35 @@ body {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+@media (max-width: 479px) {
+  .filters {
+    gap: 0.3rem 0.4rem;
+    margin: 0.5rem 0.5rem 0;
+    padding: 0.4rem 0.45rem;
+  }
+
+  .filter-field {
+    gap: 0.12rem;
+  }
+
+  .filter-field span {
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+  }
+
+  .filter-field select {
+    min-height: 2rem;
+    padding: 0.2rem 1.5rem 0.2rem 0.4rem;
+    font-size: 14px;
+  }
+}
+
+.auth-message a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .team-banner {
   margin: 0.5rem 0.75rem 0;
   padding: 0.5rem 0.65rem;

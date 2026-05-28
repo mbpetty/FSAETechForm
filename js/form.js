@@ -121,19 +121,9 @@ async function initCompetitionFilter() {
 function initTeamFilter() {
   const select = document.getElementById("filter-school");
   const competition = document.getElementById("filter-competition").value;
-  const current = select.value;
+  const teams = getTeamsForCompetition(competition);
 
-  select.querySelectorAll("option:not([value='all'])").forEach((o) => o.remove());
-
-  getTeamsForCompetition(competition).forEach((team) => {
-    const opt = document.createElement("option");
-    opt.value = team.id;
-    opt.textContent = `${team.teamName} #${team.carNumber}`;
-    select.appendChild(opt);
-  });
-
-  const stillValid = [...select.options].some((o) => o.value === current);
-  select.value = stillValid ? current : "all";
+  fillTeamSelect(select, teams, { selectedValue: select.value, includeAll: true });
 }
 
 function initStationFilter() {
@@ -385,7 +375,7 @@ function applyFilters() {
   });
 
   const team = getSelectedTeam();
-  const teamLabel = team ? `${team.teamName} #${team.carNumber}` : "All teams";
+  const teamLabel = team ? formatTeamFilterLabel(team) : "All teams";
   const competition = document.getElementById("filter-competition").value;
   const assignedCount = getInspectionsForCompetition(competition).length;
   const count =

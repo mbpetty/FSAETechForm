@@ -6,13 +6,15 @@
 .dashboard-filters {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem 0;
+  gap: 0.3rem 0.4rem;
+  padding: 0.45rem 0.75rem 0;
 }
 
-@media (max-width: 420px) {
+@media (min-width: 480px) {
   .dashboard-filters {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem 1rem 0;
   }
 }
 
