@@ -274,6 +274,13 @@ function bindOtpForm({ emailInputId, codeStepId, sendBtnId, verifyBtnId, onSend,
   const codeInput = document.getElementById("otp-code");
   let pendingEmail = "";
 
+  emailInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+
   sendBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     if (!email) return;
@@ -306,6 +313,13 @@ function bindOtpForm({ emailInputId, codeStepId, sendBtnId, verifyBtnId, onSend,
 
   codeInput?.addEventListener("input", () => {
     codeInput.value = normalizeOtpToken(codeInput.value).slice(0, OTP_LENGTH);
+  });
+
+  codeInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      verifyBtn.click();
+    }
   });
 
   verifyBtn.addEventListener("click", async () => {
