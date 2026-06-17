@@ -115,9 +115,45 @@ function readSelectedStationsFromForm() {
   return [...selectedStations];
 }
 
+function getUniqueStations() {
+  const stations = new Set();
+  getInspections().forEach((item) => {
+    item.stations.forEach((s) => stations.add(s));
+  });
+  return [...stations].sort((a, b) => a.localeCompare(b));
+}
+
+function populateInspectionStationFilter() {
+  const select = document.getElementById("inspection-station-filter");
+  if (!select) return;
+
+  const current = select.value;
+  const stations = getUniqueStations();
+
+  select.innerHTML = '<option value="">All stations</option>';
+  stations.forEach((station) => {
+    const opt = document.createElement("option");
+    opt.value = station;
+    opt.textContent = station;
+    select.appendChild(opt);
+  });
+
+  if (stations.includes(current)) {
+    select.value = current;
+  }
+}
+
 function renderInspectionList() {
+  populateInspectionStationFilter();
+
   const list = document.getElementById("inspection-admin-list");
-  const items = getInspections();
+  const filterSelect = document.getElementById("inspection-station-filter");
+  const filterStation = filterSelect ? filterSelect.value : "";
+  let items = getInspections();
+
+  if (filterStation) {
+    items = items.filter((item) => item.stations.includes(filterStation));
+  }
 
   if (!items.length) {
     list.innerHTML =
@@ -160,6 +196,7 @@ function renderInspectionList() {
       if (!confirm(`Delete inspection "${item.title}"?`)) return;
       try {
         await deleteInspection(key);
+        populateInspectionStationFilter();
         renderInspectionList();
         showToast("Inspection deleted.");
       } catch (err) {
@@ -753,6 +790,7 @@ async function handleInspectionCsvFile(file) {
   try {
     const text = await readCsvFile(file);
     await importInspectionsFromCsvText(text, { replaceAll: replace });
+    populateInspectionStationFilter();
     renderInspectionList();
     showToast(`Imported inspections from ${file.name}.`);
   } catch (err) {
@@ -794,12 +832,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadInspections();
     await loadTeams();
     await loadCompetitionAssignments();
+    populateInspectionStationFilter();
     renderInspectionList();
     renderTeamList();
     renderCompetitionList();
     showSetupBanner();
   } catch (err) {
     showToast(err.message, true);
+    populateInspectionStationFilter();
     renderInspectionList();
     renderTeamList();
     renderCompetitionList();
@@ -807,6 +847,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("add-inspection-btn").addEventListener("click", () => openInspectionForm());
   document.getElementById("cancel-inspection-btn").addEventListener("click", closeInspectionForm);
+
+  const stationFilter = document.getElementById("inspection-station-filter");
+  stationFilter?.addEventListener("change", renderInspectionList);
 
   document.getElementById("add-station-btn").addEventListener("click", () => {
     const input = document.getElementById("inspection-station-custom");
@@ -839,6 +882,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       await upsertInspection(payload);
+      populateInspectionStationFilter();
       renderInspectionList();
       closeInspectionForm();
       showToast("Inspection saved.");
