@@ -694,3 +694,32 @@ body {
   justify-content: flex-end;
   margin-top: 1rem;
 }
+
+/* Floating feedback button (bottom of page, mobile-friendly) */
+.floating-feedback-btn {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 900;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+
+.floating-feedback-btn:hover {
+  filter: brightness(1.05);
+}
+
+@media (min-width: 768px) {
+  .floating-feedback-btn {
+    bottom: 1.25rem;
+    right: 1.5rem;
+    padding: 0.55rem 1.1rem;
+  }
+}

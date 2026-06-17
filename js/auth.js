@@ -256,7 +256,6 @@ function renderAuthHeader(profile, currentPage) {
 
   nav.innerHTML = `
     ${links.map((l) => `<a class="header-link" href="${l.href}">${l.label}</a>`).join("")}
-    <button type="button" class="header-link" id="feedback-btn">Feedback</button>
     <span class="auth-user-chip">
       <span class="auth-user-name">${escapeHtml(profile.fullName || profile.email)}</span>
       <span class="auth-user-role">${escapeHtml(getRoleLabel(profile.role || profile.requestedRole))}</span>
@@ -265,7 +264,23 @@ function renderAuthHeader(profile, currentPage) {
   `;
 
   document.getElementById("logout-btn")?.addEventListener("click", () => signOut());
-  document.getElementById("feedback-btn")?.addEventListener("click", () => openFeedbackModal());
+
+  // Add floating feedback button at the bottom (mobile friendly)
+  addFloatingFeedbackButton();
+}
+
+function addFloatingFeedbackButton() {
+  // Remove any existing one first
+  const existing = document.getElementById("floating-feedback-btn");
+  if (existing) existing.remove();
+
+  const btn = document.createElement("button");
+  btn.id = "floating-feedback-btn";
+  btn.textContent = "Feedback";
+  btn.className = "floating-feedback-btn";
+  btn.addEventListener("click", () => openFeedbackModal());
+
+  document.body.appendChild(btn);
 }
 
 function bindOtpForm({ emailInputId, codeStepId, sendBtnId, verifyBtnId, onSend, onVerified }) {
