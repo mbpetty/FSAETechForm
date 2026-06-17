@@ -72,8 +72,10 @@ function switchTab(tab) {
   document.getElementById("panel-competitions").hidden = tab !== "competitions";
   document.getElementById("panel-users").hidden = tab !== "users";
   document.getElementById("panel-activity").hidden = tab !== "activity";
+  document.getElementById("panel-feedback").hidden = tab !== "feedback";
   if (tab === "users") renderUsersPanel();
   if (tab === "activity") renderActivityLog(true);
+  if (tab === "feedback") renderFeedbackList();
 }
 
 function getStationOptions() {
@@ -204,6 +206,51 @@ function renderInspectionList() {
       }
     });
   });
+}
+
+async function renderFeedbackList() {
+  const list = document.getElementById("feedback-list");
+  const empty = document.getElementById("feedback-empty");
+  if (!list) return;
+
+  list.innerHTML = '<li class="admin-empty">Loading…</li>';
+
+  try {
+    const { data, error } = await getSupabase()
+      .from("feedback")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+
+    if (!data || !data.length) {
+      list.innerHTML = "";
+      empty.hidden = false;
+      return;
+    }
+
+    empty.hidden = true;
+    list.innerHTML = data
+      .map((fb) => {
+        const date = new Date(fb.created_at).toLocaleString();
+        return `
+          <li class="admin-list-item">
+            <div class="admin-list-head">
+              <div>
+                <p class="admin-list-title">${escapeHtml(fb.category || "other")} — ${escapeHtml(fb.user_name || fb.user_email || "Anonymous")}</p>
+                <p class="admin-list-meta">${date}</p>
+              </div>
+            </div>
+            <p class="admin-list-preview">${escapeHtml(fb.message)}</p>
+          </li>
+        `;
+      })
+      .join("");
+  } catch (err) {
+    list.innerHTML = `<li class="admin-empty">Could not load feedback. Make sure the feedback table exists (see docs/FUTURE-FEATURES.md or run the SQL below).</li>`;
+    console.error(err);
+  }
 }
 
 function openInspectionForm(item = null) {
@@ -995,6 +1042,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("invite-team-wrap").hidden =
       document.getElementById("invite-role").value !== "team_member";
   });
+
+  document.getElementById("feedback-refresh-btn")?.addEventListener("click", renderFeedbackList);
 
   document.getElementById("add-user-form").addEventListener("submit", async (e) => {
     e.preventDefault();

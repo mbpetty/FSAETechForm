@@ -256,6 +256,7 @@ function renderAuthHeader(profile, currentPage) {
 
   nav.innerHTML = `
     ${links.map((l) => `<a class="header-link" href="${l.href}">${l.label}</a>`).join("")}
+    <button type="button" class="header-link" id="feedback-btn">Feedback</button>
     <span class="auth-user-chip">
       <span class="auth-user-name">${escapeHtml(profile.fullName || profile.email)}</span>
       <span class="auth-user-role">${escapeHtml(getRoleLabel(profile.role || profile.requestedRole))}</span>
@@ -264,6 +265,7 @@ function renderAuthHeader(profile, currentPage) {
   `;
 
   document.getElementById("logout-btn")?.addEventListener("click", () => signOut());
+  document.getElementById("feedback-btn")?.addEventListener("click", () => openFeedbackModal());
 }
 
 function bindOtpForm({ emailInputId, codeStepId, sendBtnId, verifyBtnId, onSend, onVerified }) {
@@ -350,4 +352,64 @@ function showAuthMessage(message, isError = false, { html = false } = {}) {
   else el.textContent = message;
   el.classList.toggle("is-error", isError);
   el.hidden = !message;
+}
+
+function openFeedbackModal() {
+  const existing = document.getElementById("feedback-modal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "feedback-modal";
+  modal.innerHTML = `
+    <div class="modal-backdrop"></div>
+    <div class="modal-content feedback-modal">
+      <h3>Send feedback</h3>
+      <label>
+        <span>Category</span>
+        <select id="feedback-category">
+          <option value="bug">Bug / something broken</option>
+          <option value="feature">Feature request</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label>
+        <span>Message</span>
+        <textarea id="feedback-message" rows="5" placeholder="What would you like us to know?"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="feedback-cancel">Cancel</button>
+        <button type="button" class="btn-primary" id="feedback-submit">Send</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector("#feedback-cancel").addEventListener("click", () => modal.remove());
+  modal.querySelector(".modal-backdrop").addEventListener("click", () => modal.remove());
+
+  modal.querySelector("#feedback-submit").addEventListener("click", async () => {
+    const category = modal.querySelector("#feedback-category").value;
+    const message = modal.querySelector("#feedback-message").value.trim();
+    if (!message) {
+      alert("Please enter a message.");
+      return;
+    }
+
+    const profile = getCurrentProfile();
+    try {
+      const { error } = await getSupabase().from("feedback").insert({
+        user_id: profile?.id || null,
+        user_name: profile?.fullName || null,
+        user_email: profile?.email || null,
+        category,
+        message,
+      });
+      if (error) throw error;
+      modal.remove();
+      alert("Thank you! Your feedback has been sent.");
+    } catch (err) {
+      alert("Could not send feedback: " + err.message);
+    }
+  });
 }

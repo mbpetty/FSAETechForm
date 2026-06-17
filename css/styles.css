@@ -632,3 +632,65 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Feedback modal */
+#feedback-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#feedback-modal .modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+#feedback-modal .modal-content {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg);
+}
+
+#feedback-modal h3 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+#feedback-modal label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+#feedback-modal label span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+#feedback-modal select,
+#feedback-modal textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 1rem;
+}
+
+#feedback-modal .modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}

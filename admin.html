@@ -28,6 +28,7 @@
         <button type="button" class="admin-tab" data-tab="competitions">Competitions</button>
         <button type="button" class="admin-tab" data-tab="users">Users</button>
         <button type="button" class="admin-tab" data-tab="activity">Activity log</button>
+        <button type="button" class="admin-tab" data-tab="feedback">Feedback</button>
       </nav>
 
       <p id="admin-toast" class="admin-toast" hidden role="status"></p>
@@ -248,6 +249,17 @@
         <ul id="activity-log-list" class="activity-log-list"></ul>
         <p id="activity-log-empty" class="admin-empty" hidden>No activity matches these filters.</p>
         <button type="button" class="btn-secondary btn-sm" id="activity-load-more-btn" hidden>Load more</button>
+      </section>
+
+      <!-- Feedback -->
+      <section id="panel-feedback" class="admin-panel" hidden>
+        <div class="admin-toolbar">
+          <h2>Feedback</h2>
+          <button type="button" class="btn-secondary btn-sm" id="feedback-refresh-btn">Refresh</button>
+        </div>
+        <p class="field-hint">Messages submitted by users via the in-app feedback form.</p>
+        <ul id="feedback-list" class="admin-list"></ul>
+        <p id="feedback-empty" class="admin-empty" hidden>No feedback submitted yet.</p>
       </section>
     </div>
 
