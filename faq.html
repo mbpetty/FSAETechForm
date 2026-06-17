@@ -146,9 +146,8 @@
 
         <h2>Feedback</h2>
         <p>
-          Found a bug or have a suggestion? While logged in, look for the
-          <strong>Feedback</strong> option (or ask an admin at the tech desk).
-          Your message goes directly to the organizers.
+          Found a bug or have a suggestion?
+          <button type="button" class="btn-secondary btn-sm" id="faq-feedback-btn">Open feedback form</button>
         </p>
       </main>
     </div>
@@ -168,6 +167,15 @@
           // keep public nav
         }
       })();
+
+      // Wire up the feedback button on this page (only works when logged in + auth.js loaded)
+      document.getElementById('faq-feedback-btn')?.addEventListener('click', () => {
+        if (typeof openFeedbackModal === 'function') {
+          openFeedbackModal();
+        } else {
+          alert('Feedback form is only available after logging in.');
+        }
+      });
     </script>
   </body>
 </html>
