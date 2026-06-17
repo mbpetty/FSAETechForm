@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     icon.textContent = "✕";
     title.textContent = "Access not approved";
     body.textContent =
-      "Your access request was not approved. Contact the tech inspection admin if you believe this is an error.";
+      "Your access request was not approved. Visit the Tech Inspection admin desk if you believe this is an error.";
     detail.textContent = `Signed in as ${profile.fullName || profile.email}`;
     return;
   }
