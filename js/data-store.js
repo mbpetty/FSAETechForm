@@ -509,10 +509,22 @@ async function upsertInspection(inspection) {
 }
 
 async function deleteInspection(key) {
+  // First delete any competition assignments for this item
+  if (dbSchema.hasCompetitionInspections) {
+    await getSupabase()
+      .from("competition_inspections")
+      .delete()
+      .eq("item_id", key);
+  }
+
   const { error } = await getSupabase().from("inspection_items").delete().eq("item_id", key);
 
   throwIfError(error, "delete inspection");
   invalidateCache();
+  invalidateAssignmentCache();
+  if (dbSchema.hasCompetitionInspections) {
+    await loadCompetitionAssignments();
+  }
   return loadInspections();
 }
 
