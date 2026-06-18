@@ -292,11 +292,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("dashboard-status").addEventListener("change", renderTeamList);
   document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
 
-  document.getElementById("dashboard-refresh-btn")?.addEventListener("click", () => {
-    // Force a clean load by adding a cache-busting timestamp
-    const url = new URL(window.location.href);
-    url.searchParams.set('_t', Date.now());
-    window.location.href = url.toString();
+  document.getElementById("dashboard-refresh-btn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("dashboard-refresh-btn");
+    if (btn) btn.disabled = true;
+
+    try {
+      resultsByTeam = new Map();
+      expandedTeamIds.clear();
+      await refreshResults();
+      showToast("Data refreshed.");
+    } catch (err) {
+      showToast(err.message, true);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   });
 
   try {

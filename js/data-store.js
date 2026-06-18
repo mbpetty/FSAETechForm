@@ -621,13 +621,32 @@ async function fetchResultsForTeamIds(teamIds) {
 
   await assertApprovedForDataAccess();
 
-  const { data, error } = await getSupabase()
-    .from("inspection_results")
-    .select("team_id, item_key, status, comment, updated_by_name, updated_at")
-    .in("team_id", teamIds);
+  const allRows = [];
+  const teamChunkSize = 15;
+  const pageSize = 1000;
 
-  throwIfError(error, "load team results");
-  return data ?? [];
+  for (let i = 0; i < teamIds.length; i += teamChunkSize) {
+    const teamChunk = teamIds.slice(i, i + teamChunkSize);
+    let offset = 0;
+
+    while (true) {
+      const { data, error } = await getSupabase()
+        .from("inspection_results")
+        .select("team_id, item_key, status, comment, updated_by_name, updated_at")
+        .in("team_id", teamChunk)
+        .range(offset, offset + pageSize - 1);
+
+      throwIfError(error, "load team results");
+
+      const rows = data ?? [];
+      allRows.push(...rows);
+
+      if (rows.length < pageSize) break;
+      offset += pageSize;
+    }
+  }
+
+  return allRows;
 }
 
 function groupResultsByTeam(rows) {
