@@ -292,6 +292,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("dashboard-status").addEventListener("change", renderTeamList);
   document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
 
+  document.getElementById("dashboard-refresh-btn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("dashboard-refresh-btn");
+    if (btn) btn.disabled = true;
+
+    try {
+      // Clear all relevant caches
+      resultsByTeam = new Map();
+      expandedTeamIds = new Set();
+      competitionAssignmentsCache = null;
+
+      await loadCompetitionAssignments();
+      await refreshResults();
+      renderTeamList();
+      showToast("Data refreshed.");
+    } catch (err) {
+      showToast(err.message, true);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  });
+
   try {
     await detectDbSchema();
     await loadCompetitions();
