@@ -21,6 +21,24 @@
 
       <p id="team-readonly-banner" class="team-readonly-banner" hidden></p>
 
+      <section id="team-filters" class="filters team-filters" aria-label="Filters" hidden>
+        <label class="filter-field">
+          <span>Station</span>
+          <select id="team-filter-station">
+            <option value="all">All stations</option>
+          </select>
+        </label>
+        <label class="filter-field">
+          <span>Status</span>
+          <select id="team-filter-status">
+            <option value="all">All</option>
+            <option value="pending">Not inspected</option>
+            <option value="pass">Passed</option>
+            <option value="fail">Failed</option>
+          </select>
+        </label>
+      </section>
+
       <div class="list-header">
         <h2>Inspection status</h2>
         <p id="team-list-count" class="list-count"></p>
@@ -29,7 +47,7 @@
       <p id="team-load-status" class="load-status">Loading…</p>
 
       <ul class="inspection-list" id="team-inspection-list" aria-live="polite" hidden></ul>
-      <p id="team-empty-state" class="empty-state" hidden>No inspections assigned yet.</p>
+      <p id="team-empty-state" class="empty-state" hidden>No inspections match these filters.</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
