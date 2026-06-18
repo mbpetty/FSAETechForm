@@ -65,6 +65,31 @@
   box-shadow: var(--shadow-sm);
 }
 
+.summary-stat--filter {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.summary-stat--filter:hover {
+  border-color: rgba(79, 70, 229, 0.35);
+  background: rgba(79, 70, 229, 0.04);
+}
+
+.summary-stat--filter.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+  background: rgba(79, 70, 229, 0.06);
+}
+
+.summary-stat--filter:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 .summary-stat-value {
   display: block;
   font-size: 1.25rem;

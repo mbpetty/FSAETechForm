@@ -83,7 +83,7 @@ function inspectorUrl(competitionId, teamId) {
   return `index.html?${params.toString()}`;
 }
 
-function renderSummary(teamsWithStats) {
+function renderSummary(teamsWithStats, activeFilter = "all") {
   const el = document.getElementById("dashboard-summary");
   const totalTeams = teamsWithStats.length;
   const complete = teamsWithStats.filter((t) => t.stats.inspected === t.stats.total && t.stats.total > 0).length;
@@ -92,23 +92,25 @@ function renderSummary(teamsWithStats) {
     (t) => t.stats.inspected > 0 && t.stats.inspected < t.stats.total
   ).length;
 
+  const activeClass = (filter) => (activeFilter === filter ? " is-active" : "");
+
   el.innerHTML = `
-    <div class="summary-stat">
+    <button type="button" class="summary-stat summary-stat--filter${activeClass("all")}" data-status-filter="all" aria-pressed="${activeFilter === "all"}">
       <span class="summary-stat-value">${totalTeams}</span>
       <span class="summary-stat-label">Teams</span>
-    </div>
-    <div class="summary-stat summary-stat--pass">
+    </button>
+    <button type="button" class="summary-stat summary-stat--pass summary-stat--filter${activeClass("complete")}" data-status-filter="complete" aria-pressed="${activeFilter === "complete"}">
       <span class="summary-stat-value">${complete}</span>
       <span class="summary-stat-label">Complete</span>
-    </div>
-    <div class="summary-stat">
+    </button>
+    <button type="button" class="summary-stat summary-stat--filter${activeClass("in-progress")}" data-status-filter="in-progress" aria-pressed="${activeFilter === "in-progress"}">
       <span class="summary-stat-value">${inProgress}</span>
       <span class="summary-stat-label">In progress</span>
-    </div>
-    <div class="summary-stat summary-stat--fail">
+    </button>
+    <button type="button" class="summary-stat summary-stat--fail summary-stat--filter${activeClass("has-failures")}" data-status-filter="has-failures" aria-pressed="${activeFilter === "has-failures"}">
       <span class="summary-stat-value">${withFailures}</span>
       <span class="summary-stat-label">With failures</span>
-    </div>
+    </button>
   `;
   el.hidden = false;
 }
@@ -153,7 +155,7 @@ function renderTeamList() {
     return matchesStatusFilter(stats, statusFilter);
   });
 
-  renderSummary(filtered);
+  renderSummary(teamsWithStats, statusFilter);
 
   const list = document.getElementById("dashboard-team-list");
   const empty = document.getElementById("dashboard-empty");
@@ -291,6 +293,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("dashboard-status").addEventListener("change", renderTeamList);
   document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
+
+  document.getElementById("dashboard-summary")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-status-filter]");
+    if (!btn) return;
+    const select = document.getElementById("dashboard-status");
+    select.value = btn.dataset.statusFilter;
+    renderTeamList();
+  });
 
   try {
     await detectDbSchema();
