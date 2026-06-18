@@ -1,5 +1,6 @@
 let resultsByTeam = new Map();
 let expandedTeamIds = new Set();
+let stationFilter = null;
 
 function escapeHtml(text) {
   const el = document.createElement("span");
@@ -115,6 +116,142 @@ function renderSummary(teamsWithStats, activeFilter = "all") {
   el.hidden = false;
 }
 
+function computeTeamStationStats(team, stationItems, resultsMap) {
+  const results = resultsMap.get(team.id) ?? new Map();
+  let pass = 0;
+  let fail = 0;
+
+  for (const item of stationItems) {
+    const status = results.get(item.key)?.status;
+    if (status === "pass") pass += 1;
+    else if (status === "fail") fail += 1;
+  }
+
+  const total = stationItems.length;
+  const inspected = pass + fail;
+
+  return { pass, fail, inspected, total };
+}
+
+function matchesStationFilter(team, requiredItems) {
+  if (!stationFilter) return true;
+
+  const stationItems = requiredItems.filter((item) => item.stationIds.includes(stationFilter.stationId));
+  if (!stationItems.length) return false;
+
+  const stats = computeTeamStationStats(team, stationItems, resultsByTeam);
+  if (stationFilter.metric === "started") return stats.inspected > 0;
+  if (stationFilter.metric === "passed") return stats.total > 0 && stats.pass === stats.total;
+  if (stationFilter.metric === "failed") return stats.fail > 0;
+  return true;
+}
+
+function stationFilterLabel(competitionId) {
+  if (!stationFilter) return "";
+
+  const station = getStations(competitionId).find((s) => s.id === stationFilter.stationId);
+  const stationName = station?.name ?? stationFilter.stationId;
+  const metricLabels = { started: "started", passed: "passed", failed: "failed" };
+  const metric = metricLabels[stationFilter.metric] ?? stationFilter.metric;
+
+  return `${metric} at ${stationName}`;
+}
+
+function renderStationSummaryCell(stationId, metric, count, className = "") {
+  const active = stationFilter?.stationId === stationId && stationFilter?.metric === metric;
+  const disabled = count === 0;
+
+  return `
+    <td class="station-summary-col station-summary-col--${metric}">
+      <button
+        type="button"
+        class="station-summary-cell station-summary-cell--${metric} ${className}${active ? " is-active" : ""}"
+        data-station-id="${escapeHtml(stationId)}"
+        data-station-metric="${metric}"
+        ${disabled ? "disabled" : ""}
+        aria-pressed="${active}"
+        title="${disabled ? "" : `Show teams ${metric} at this station`}"
+      >${count}</button>
+    </td>
+  `;
+}
+
+function renderStationSummary(competitionId, teams, requiredItems) {
+  const el = document.getElementById("dashboard-station-summary");
+  if (!el) return;
+
+  if (!teams.length || !requiredItems.length) {
+    el.hidden = true;
+    return;
+  }
+
+  const stations = getStations(competitionId);
+  const rows = [];
+
+  for (const station of stations) {
+    const stationItems = requiredItems.filter((item) => item.stationIds.includes(station.id));
+    if (!stationItems.length) continue;
+
+    let started = 0;
+    let passed = 0;
+    let failed = 0;
+
+    for (const team of teams) {
+      const stats = computeTeamStationStats(team, stationItems, resultsByTeam);
+      if (stats.inspected > 0) started += 1;
+      if (stats.fail > 0) failed += 1;
+      if (stats.total > 0 && stats.pass === stats.total) passed += 1;
+    }
+
+    rows.push({ id: station.id, name: station.name, started, passed, failed });
+  }
+
+  if (!rows.length) {
+    el.hidden = true;
+    return;
+  }
+
+  const filterHint = stationFilter
+    ? `<span class="station-summary-filter-pill">Filtered: ${escapeHtml(stationFilterLabel(competitionId))} · tap count to clear</span>`
+    : "";
+
+  el.innerHTML = `
+    <div class="station-summary-card">
+      <div class="station-summary-header">
+        <h3 class="station-summary-title">By station</h3>
+        ${filterHint}
+      </div>
+      <div class="station-summary-scroll">
+        <table class="station-summary-table">
+          <thead>
+            <tr>
+              <th scope="col" class="station-summary-col-station">Station</th>
+              <th scope="col">Started</th>
+              <th scope="col">Pass</th>
+              <th scope="col">Fail</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows
+              .map(
+                (row) => `
+              <tr>
+                <th scope="row" class="station-summary-col-station" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</th>
+                ${renderStationSummaryCell(row.id, "started", row.started)}
+                ${renderStationSummaryCell(row.id, "passed", row.passed, "station-summary-pass")}
+                ${renderStationSummaryCell(row.id, "failed", row.failed, "station-summary-fail")}
+              </tr>
+            `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  el.hidden = false;
+}
+
 function renderFailures(failures) {
   if (!failures.length) return "";
 
@@ -152,10 +289,12 @@ function renderTeamList() {
 
   const filtered = teamsWithStats.filter(({ team, stats }) => {
     if (teamFilter !== "all" && team.id !== teamFilter) return false;
-    return matchesStatusFilter(stats, statusFilter);
+    if (!matchesStatusFilter(stats, statusFilter)) return false;
+    return matchesStationFilter(team, requiredItems);
   });
 
-  renderSummary(teamsWithStats, statusFilter);
+  renderSummary(teamsWithStats, stationFilter ? null : statusFilter);
+  renderStationSummary(competitionId, teams, requiredItems);
 
   const list = document.getElementById("dashboard-team-list");
   const empty = document.getElementById("dashboard-empty");
@@ -177,7 +316,9 @@ function renderTeamList() {
   if (!filtered.length) {
     list.hidden = true;
     empty.hidden = false;
-    empty.textContent = "No teams match these filters.";
+    empty.textContent = stationFilter
+      ? `No teams match ${stationFilterLabel(competitionId)}.`
+      : "No teams match these filters.";
     return;
   }
 
@@ -283,6 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("dashboard-competition").addEventListener("change", async () => {
     expandedTeamIds.clear();
+    stationFilter = null;
     initDashboardTeamFilter();
     try {
       await refreshResults();
@@ -291,15 +433,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("dashboard-status").addEventListener("change", renderTeamList);
+  document.getElementById("dashboard-status").addEventListener("change", () => {
+    stationFilter = null;
+    renderTeamList();
+  });
   document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
 
   document.getElementById("dashboard-summary")?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-status-filter]");
     if (!btn) return;
+    stationFilter = null;
     const select = document.getElementById("dashboard-status");
     select.value = btn.dataset.statusFilter;
     renderTeamList();
+  });
+
+  document.getElementById("dashboard-station-summary")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-station-metric]");
+    if (!btn || btn.disabled) return;
+
+    const nextFilter = { stationId: btn.dataset.stationId, metric: btn.dataset.stationMetric };
+    const isSame =
+      stationFilter?.stationId === nextFilter.stationId && stationFilter?.metric === nextFilter.metric;
+
+    stationFilter = isSame ? null : nextFilter;
+
+    if (stationFilter) {
+      document.getElementById("dashboard-status").value = "all";
+      document.getElementById("dashboard-team").value = "all";
+    }
+
+    renderTeamList();
+    if (stationFilter) {
+      document.getElementById("dashboard-team-list")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
 
   try {
