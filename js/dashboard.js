@@ -292,30 +292,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("dashboard-status").addEventListener("change", renderTeamList);
   document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
 
-  document.getElementById("dashboard-refresh-btn")?.addEventListener("click", async () => {
-    const btn = document.getElementById("dashboard-refresh-btn");
-    if (btn) btn.disabled = true;
-
-    try {
-      // Nuclear option: clear every cache the dashboard uses
-      resultsByTeam = new Map();
-      expandedTeamIds = new Set();
-      competitionAssignmentsCache = null;
-      inspectionsCache = null;
-      teamsCache = null;
-
-      await detectDbSchema();
-      await loadInspections();
-      await loadTeams();
-      await loadCompetitionAssignments();
-      await refreshResults();
-      renderTeamList();
-      showToast("Data fully refreshed.");
-    } catch (err) {
-      showToast(err.message, true);
-    } finally {
-      if (btn) btn.disabled = false;
-    }
+  document.getElementById("dashboard-refresh-btn")?.addEventListener("click", () => {
+    // Hard reload is the only reliable way to clear all in-memory state
+    // after large backfills or data repairs.
+    location.reload(true);
   });
 
   try {
