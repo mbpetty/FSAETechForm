@@ -293,9 +293,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
 
   document.getElementById("dashboard-refresh-btn")?.addEventListener("click", () => {
-    // Hard reload is the only reliable way to clear all in-memory state
-    // after large backfills or data repairs.
-    location.reload(true);
+    // Force a clean load by adding a cache-busting timestamp
+    const url = new URL(window.location.href);
+    url.searchParams.set('_t', Date.now());
+    window.location.href = url.toString();
   });
 
   try {
