@@ -297,15 +297,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btn) btn.disabled = true;
 
     try {
-      // Clear all relevant caches
+      // Nuclear option: clear every cache the dashboard uses
       resultsByTeam = new Map();
       expandedTeamIds = new Set();
       competitionAssignmentsCache = null;
+      inspectionsCache = null;
+      teamsCache = null;
 
+      await detectDbSchema();
+      await loadInspections();
+      await loadTeams();
       await loadCompetitionAssignments();
       await refreshResults();
       renderTeamList();
-      showToast("Data refreshed.");
+      showToast("Data fully refreshed.");
     } catch (err) {
       showToast(err.message, true);
     } finally {
