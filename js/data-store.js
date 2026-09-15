@@ -27,9 +27,10 @@ async function assertApprovedForDataAccess() {
 
   throwIfError(error, "check access");
 
-  if (!profile || profile.status !== "approved") {
-    throw new Error("Your account is awaiting admin approval.");
-  }
+  // Approved users: full access. Anon: allowed (RLS gates). Pending/rejected: allow
+  // public checklist reads; sensitive tables (results, writes) stay locked by RLS.
+  if (!profile) return;
+  if (profile.status === "approved") return;
 }
 
 function formatAttribution(updatedByName, updatedAt) {
@@ -43,6 +44,15 @@ function formatAttribution(updatedByName, updatedAt) {
 function exportUrl(teamId, competitionId, from = "") {
   const params = new URLSearchParams({ team: teamId });
   if (competitionId && competitionId !== "all") params.set("competition", competitionId);
+  if (from) params.set("from", from);
+  return `export.html?${params.toString()}`;
+}
+
+/** Blank printable checklist — no login; optional team for header only. */
+function checklistExportUrl(competitionId, teamId = "", from = "public") {
+  const params = new URLSearchParams({ mode: "checklist" });
+  if (competitionId) params.set("competition", competitionId);
+  if (teamId) params.set("team", teamId);
   if (from) params.set("from", from);
   return `export.html?${params.toString()}`;
 }

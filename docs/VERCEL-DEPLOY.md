@@ -76,6 +76,7 @@ Replace `YOUR-APP` with your Vercel subdomain:
 |------|-----|
 | Log in | https://YOUR-APP.vercel.app/login.html |
 | Sign up | https://YOUR-APP.vercel.app/signup.html |
+| Public checklist | https://YOUR-APP.vercel.app/public.html |
 | Inspector | https://YOUR-APP.vercel.app/index.html |
 | Dashboard | https://YOUR-APP.vercel.app/dashboard.html |
 | Manage | https://YOUR-APP.vercel.app/admin.html |

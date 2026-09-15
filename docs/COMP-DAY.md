@@ -4,16 +4,26 @@ Print or bookmark this page for inspection day. Production site: **https://fsaet
 
 ---
 
+## Tech inspection process
+
+- **EV and Mech run in parallel** — electric and mechanical tech streams operate at the same time so cars can progress both paths without waiting for the other to finish.
+- **Brake is last** — complete other required stations before Brake Test; do not queue for brake until the car is otherwise ready for that final check.
+- Follow marshal / tech lead direction if lanes are reordered for weather or throughput.
+
+---
+
 ## URLs (production)
 
 | Who | Link |
 |-----|------|
+| **Public checklist** (no login) | https://fsaetechform.com/public.html |
 | **Log in** (tablets) | https://fsaetechform.com/login.html |
 | **Inspector** | https://fsaetechform.com/index.html |
 | **Organizer dashboard** | https://fsaetechform.com/dashboard.html |
 | **Admin / manage** | https://fsaetechform.com/admin.html |
 | **Team read-only** | https://fsaetechform.com/team.html |
 | **Sign up** (new users) | https://fsaetechform.com/signup.html |
+| **FAQ** | https://fsaetechform.com/faq.html |
 
 Local testing: swap `fsaetechform.com` → `localhost:8080` (same paths).
 
@@ -27,6 +37,7 @@ Local testing: swap `fsaetechform.com` → `localhost:8080` (same paths).
 4. **Competitions** — inspections assigned to the correct comp (e.g. June EV)  
 5. **Users** — approve all inspectors; approve team members with correct team  
 6. Open **dashboard** — confirm teams appear  
+7. Run **`sql/09_public_checklist_read.sql`** in Supabase SQL Editor so the public form can load inspections  
 
 ---
 
@@ -45,19 +56,20 @@ Local testing: swap `fsaetechform.com` → `localhost:8080` (same paths).
 
 ## Organizer workflow
 
-1. **Dashboard** — all teams, progress bars, failures  
+1. **Dashboard** — all teams, progress bars, station summary, failures  
 2. Filter by competition / status  
 3. **Show failures** on a team card for details  
 4. **Inspect** — jump to that team in the inspector view  
-5. **Export PDF** — from dashboard or inspector when a team is selected  
+5. **Export PDF** — card-style report from dashboard or inspector when a team is selected  
 
 ---
 
 ## Team member workflow
 
-1. Sign up → wait for **admin approval**  
-2. After approval, log in → **My team** (read-only status + comments)  
-3. Cannot change pass/fail until approved; pending users see only the approval screen  
+1. Open **public tech form** (no login) → pick competition → **Print / Save PDF** for a blank checklist  
+2. Sign up → wait for **admin approval** for live status  
+3. After approval, log in → **My team** (read-only status + comments)  
+4. Cannot change pass/fail; pending users see only the approval screen  
 
 ---
 

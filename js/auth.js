@@ -246,6 +246,9 @@ function renderAuthHeader(profile, currentPage) {
     if (profile.role === "admin" && currentPage !== "admin") {
       links.push({ href: "admin.html", label: "Admin" });
     }
+    if (currentPage !== "public") {
+      links.push({ href: "public.html", label: "Public form" });
+    }
     if (currentPage !== "faq") {
       links.push({ href: "faq.html", label: "FAQ" });
     }

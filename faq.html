@@ -81,6 +81,7 @@
       <header class="app-header app-header--row">
         <h1>FAQ</h1>
         <nav class="header-nav public-nav" aria-label="Site links">
+          <a href="public.html">Public form</a>
           <a href="login.html">Log in</a>
           <a href="signup.html">Sign up</a>
         </nav>
@@ -89,16 +90,30 @@
       <main class="faq-page">
         <p class="lead">Quick reference for inspection day. Site: <a href="https://fsaetechform.com/login.html">fsaetechform.com</a></p>
 
+        <h2>Tech inspection process</h2>
+        <p>
+          Electric (EV) and Mechanical (Mech) tech run <strong>in parallel</strong> so cars can move through
+          both paths without waiting for the other stream to finish. Work stations in the order posted at
+          the event; keep moving as lanes open.
+        </p>
+        <ul>
+          <li><strong>EV and Mech in parallel</strong> — teams may progress both tracks during the same window.</li>
+          <li><strong>Brake is last</strong> — complete other required stations before Brake Test. Do not queue for brake until your car is otherwise ready for that final check.</li>
+          <li>Follow marshal / tech lead direction if lanes are reordered for weather or throughput.</li>
+        </ul>
+
         <h2>URLs</h2>
         <table>
           <thead><tr><th>Who</th><th>Link</th></tr></thead>
           <tbody>
+            <tr><td>Public checklist (no login)</td><td><a href="https://fsaetechform.com/public.html">fsaetechform.com/public.html</a></td></tr>
             <tr><td>Log in (tablets)</td><td><a href="https://fsaetechform.com/login.html">fsaetechform.com/login.html</a></td></tr>
             <tr><td>Inspector</td><td><a href="https://fsaetechform.com/index.html">fsaetechform.com/index.html</a></td></tr>
             <tr><td>Dashboard</td><td><a href="https://fsaetechform.com/dashboard.html">fsaetechform.com/dashboard.html</a></td></tr>
             <tr><td>Admin</td><td><a href="https://fsaetechform.com/admin.html">fsaetechform.com/admin.html</a></td></tr>
             <tr><td>Team view</td><td><a href="https://fsaetechform.com/team.html">fsaetechform.com/team.html</a></td></tr>
             <tr><td>Sign up</td><td><a href="https://fsaetechform.com/signup.html">fsaetechform.com/signup.html</a></td></tr>
+            <tr><td>FAQ</td><td><a href="https://fsaetechform.com/faq.html">fsaetechform.com/faq.html</a></td></tr>
           </tbody>
         </table>
 
@@ -110,6 +125,7 @@
           <li>Competitions — inspections assigned</li>
           <li>Users — approve or invite inspectors and team members</li>
           <li>Dashboard — confirm teams appear</li>
+          <li>Run <code>sql/09_public_checklist_read.sql</code> in Supabase if the public form cannot load inspections</li>
         </ol>
 
         <h2>Inspector workflow (tablet)</h2>
@@ -123,14 +139,15 @@
 
         <h2>Organizer workflow</h2>
         <ol>
-          <li>Dashboard — progress bars and failures</li>
-          <li>Export PDF — from dashboard or inspector when a team is selected</li>
+          <li>Dashboard — progress bars, station summary, and failures</li>
+          <li>Export PDF — from dashboard or inspector when a team is selected (card-style report)</li>
         </ol>
 
         <h2>Team members</h2>
         <ol>
-          <li>Sign up → wait for admin approval</li>
-          <li>After approval, log in → My team (read-only)</li>
+          <li>Use the <a href="public.html">public tech form</a> (no login) to browse the checklist and print a blank PDF</li>
+          <li>Sign up → wait for admin approval for live My team status</li>
+          <li>After approval, log in → My team (read-only live results)</li>
         </ol>
 
         <h2>Troubleshooting</h2>
@@ -140,6 +157,7 @@
             <tr><td>Can't log in</td><td>Request a new code; check spam</td></tr>
             <tr><td>Awaiting approval</td><td>Admin → Users → Approve</td></tr>
             <tr><td>Empty inspection list</td><td>Admin → Competitions → assign inspections</td></tr>
+            <tr><td>Public form empty / permission error</td><td>Run <code>sql/09_public_checklist_read.sql</code> in Supabase SQL Editor</td></tr>
             <tr><td>No live sync</td><td>Select a team; check internet</td></tr>
           </tbody>
         </table>

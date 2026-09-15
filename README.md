@@ -19,6 +19,7 @@ python3 -m http.server 8080
 
 | Page | URL |
 |------|-----|
+| Public checklist (no login) | http://localhost:8080/public.html |
 | Log in | http://localhost:8080/login.html |
 | Sign up | http://localhost:8080/signup.html |
 | Inspector | http://localhost:8080/index.html |

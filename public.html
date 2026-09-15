@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e1b4b" />
+    <title>Public Tech Form — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <link rel="stylesheet" href="css/rich-text.css" />
+    <style>
+      .public-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.65rem;
+        align-items: center;
+        margin-left: auto;
+      }
+      .public-nav a {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.92);
+        text-decoration: none;
+      }
+      .public-banner {
+        margin: 0.65rem 1rem 0;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.82rem;
+        line-height: 1.4;
+        color: var(--text-secondary);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+      }
+      .public-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin: 0.65rem 1rem 0;
+      }
+      .public-actions .btn-export {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.25rem;
+        padding: 0 0.9rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .public-actions .btn-export:disabled,
+      .public-actions .btn-export[aria-disabled="true"] {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+      .public-station-heading {
+        margin: 0.85rem 1rem 0.35rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+      .public-checklist-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 3.6rem;
+        height: 1.5rem;
+        padding: 0 0.4rem;
+        margin-left: auto;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        border: 1.5px dashed rgba(15, 23, 42, 0.25);
+        border-radius: 999px;
+        background: rgba(248, 250, 252, 0.9);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header app-header--row">
+        <h1>Public tech form</h1>
+        <nav class="header-nav public-nav" aria-label="Site links">
+          <a href="faq.html">FAQ</a>
+          <a href="login.html">Log in</a>
+          <a href="signup.html">Sign up</a>
+        </nav>
+      </header>
+
+      <p class="public-banner">
+        No sign-in required. Browse the full inspection checklist for a competition, then print a blank form to check your car.
+      </p>
+
+      <section class="filters" aria-label="Filters">
+        <label class="filter-field">
+          <span>Competition</span>
+          <select id="public-competition"></select>
+        </label>
+        <label class="filter-field">
+          <span>Station</span>
+          <select id="public-station">
+            <option value="all">All stations</option>
+          </select>
+        </label>
+      </section>
+
+      <div class="public-actions">
+        <a id="public-print-btn" class="btn-export" href="#" aria-disabled="true">Print / Save PDF</a>
+      </div>
+
+      <div class="list-header">
+        <h2>Inspections</h2>
+        <p id="public-list-count" class="list-count"></p>
+      </div>
+
+      <p id="public-load-status" class="load-status">Loading…</p>
+      <div id="public-inspection-list" aria-live="polite" hidden></div>
+      <p id="public-empty-state" class="empty-state" hidden>No inspections assigned to this competition.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/csv-utils.js"></script>
+    <script src="js/data-store.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+    <script src="js/rich-text.js"></script>
+    <script src="js/public.js"></script>
+  </body>
+</html>

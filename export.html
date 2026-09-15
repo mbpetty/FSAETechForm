@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Export — FSAE Tech Inspection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/export.css" />
     <link rel="stylesheet" href="css/rich-text.css" />
   </head>
@@ -15,24 +18,13 @@
 
     <article id="export-document" class="export-document">
       <header class="export-header">
-        <h1>FSAE Technical Inspection</h1>
+        <p class="export-eyebrow">FSAE Technical Inspection</p>
+        <h1 id="export-title">Inspection report</h1>
         <p id="export-team-line" class="export-team-line"></p>
         <p id="export-meta-line" class="export-meta-line"></p>
       </header>
 
-      <table class="export-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Inspection</th>
-            <th>Status</th>
-            <th>Pass/Fail comment</th>
-            <th>Inspector</th>
-            <th>Date &amp; time</th>
-          </tr>
-        </thead>
-        <tbody id="export-table-body"></tbody>
-      </table>
+      <div id="export-body" class="export-body"></div>
 
       <footer class="export-footer">
         <p id="export-summary"></p>
