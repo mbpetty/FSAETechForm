@@ -9,6 +9,8 @@
 | **External inspection status API** | Not started — read-only API or embed for partner sites (with permission) to show team inspection status on their own dashboards |
 | **In-app user feedback collection** | Implemented — Feedback button + modal for all logged-in users; Admin → Feedback tab to review submissions (requires `feedback` table) |
 | **QR code → team inspection** | Potential next-year item |
+| **Archive inspections / competitions / teams** | Not started — hide older years from active lists so Admin and dropdowns stay manageable across multiple seasons (keep data recoverable, not hard-delete) |
+| **Auto PDF when team completes tech** | Not started — when all inspections for a team are complete, automatically generate the PDF report and save it somewhere (storage / download archive) for later retrieval |
 
 ---
 

@@ -285,12 +285,42 @@ function closeInspectionForm() {
   selectedStations.clear();
 }
 
+function populateTeamCompetitionFilter() {
+  const select = document.getElementById("team-competition-filter");
+  if (!select) return;
+
+  const previous = select.value;
+  const competitions = getCompetitions();
+
+  select.innerHTML =
+    '<option value="">All competitions</option>' +
+    competitions
+      .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`)
+      .join("");
+
+  const stillValid = [...select.options].some((o) => o.value === previous);
+  select.value = stillValid ? previous : "";
+}
+
 function renderTeamList() {
+  populateTeamCompetitionFilter();
+
   const list = document.getElementById("team-admin-list");
-  const teams = getTeams();
+  const filterId = document.getElementById("team-competition-filter")?.value ?? "";
+  let teams = getTeams();
+
+  if (filterId) {
+    teams = teams.filter((t) => t.competition === filterId);
+  }
+
+  teams = [...teams].sort((a, b) =>
+    a.carNumber.localeCompare(b.carNumber, undefined, { numeric: true })
+  );
 
   if (!teams.length) {
-    list.innerHTML = '<li class="admin-empty">No teams yet. Upload a CSV or add one manually.</li>';
+    list.innerHTML = filterId
+      ? '<li class="admin-empty">No teams in this competition.</li>'
+      : '<li class="admin-empty">No teams yet. Upload a CSV or add one manually.</li>';
     return;
   }
 
@@ -897,6 +927,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const stationFilter = document.getElementById("inspection-station-filter");
   stationFilter?.addEventListener("change", renderInspectionList);
+
+  document.getElementById("team-competition-filter")?.addEventListener("change", renderTeamList);
 
   document.getElementById("add-station-btn").addEventListener("click", () => {
     const input = document.getElementById("inspection-station-custom");
