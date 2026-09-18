@@ -1,5 +1,80 @@
 const DEFAULT_COMPETITION = "michigan-june";
 
+const FILTER_PREF = {
+  competition: "fsae.pref.competition",
+  station: "fsae.pref.station",
+  dashboardStation: "fsae.pref.dashboardStationFilter",
+};
+
+function getFilterPref(key) {
+  try {
+    return localStorage.getItem(key) || "";
+  } catch {
+    return "";
+  }
+}
+
+function setFilterPref(key, value) {
+  try {
+    if (value == null || value === "") localStorage.removeItem(key);
+    else localStorage.setItem(key, String(value));
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+function getStoredCompetitionPref() {
+  return getFilterPref(FILTER_PREF.competition);
+}
+
+function setStoredCompetitionPref(competitionId) {
+  setFilterPref(FILTER_PREF.competition, competitionId || "");
+}
+
+function getStoredStationPref() {
+  return getFilterPref(FILTER_PREF.station) || "all";
+}
+
+function setStoredStationPref(stationId) {
+  setFilterPref(FILTER_PREF.station, stationId && stationId !== "all" ? stationId : "");
+}
+
+function getStoredDashboardStationFilter() {
+  try {
+    const raw = localStorage.getItem(FILTER_PREF.dashboardStation);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.stationId && parsed?.metric) return parsed;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function setStoredDashboardStationFilter(filter) {
+  try {
+    if (!filter) localStorage.removeItem(FILTER_PREF.dashboardStation);
+    else localStorage.setItem(FILTER_PREF.dashboardStation, JSON.stringify(filter));
+  } catch {
+    /* ignore */
+  }
+}
+
+function pickCompetitionValue(select, { preferUrl = true } = {}) {
+  if (!select) return "";
+  const options = [...select.options].map((o) => o.value);
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = preferUrl ? params.get("competition") : null;
+  const stored = getStoredCompetitionPref();
+
+  if (fromUrl && options.includes(fromUrl)) return fromUrl;
+  if (stored && options.includes(stored)) return stored;
+  if (options.includes("june-2026")) return "june-2026";
+  if (options.includes("june-ev")) return "june-ev";
+  if (options.includes(DEFAULT_COMPETITION)) return DEFAULT_COMPETITION;
+  return options.find((v) => v && v !== "all") || options[0] || "";
+}
+
 const dbSchema = {
   useStationsArray: true,
   hasCompetitionInspections: true,

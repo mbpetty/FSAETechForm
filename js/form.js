@@ -115,7 +115,8 @@ async function initCompetitionFilter() {
     competitions
       .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`)
       .join("");
-  select.value = DEFAULT_COMPETITION;
+  select.value = pickCompetitionValue(select);
+  setStoredCompetitionPref(select.value);
 }
 
 function initTeamFilter() {
@@ -129,7 +130,7 @@ function initTeamFilter() {
 function initStationFilter() {
   const select = document.getElementById("filter-station");
   const competition = document.getElementById("filter-competition").value;
-  const current = select.value;
+  const preferred = select.value !== "all" ? select.value : getStoredStationPref();
 
   select.querySelectorAll("option:not([value='all'])").forEach((o) => o.remove());
 
@@ -140,8 +141,9 @@ function initStationFilter() {
     select.appendChild(opt);
   });
 
-  const stillValid = [...select.options].some((o) => o.value === current);
-  select.value = stillValid ? current : "all";
+  const stillValid = [...select.options].some((o) => o.value === preferred);
+  select.value = stillValid ? preferred : "all";
+  setStoredStationPref(select.value);
 }
 
 function updateTeamBanner() {
@@ -219,6 +221,7 @@ async function onTeamFilterChange() {
 
 function bindFilterListeners() {
   document.getElementById("filter-competition").addEventListener("change", () => {
+    setStoredCompetitionPref(document.getElementById("filter-competition").value);
     initTeamFilter();
     initStationFilter();
     applyFilters();
@@ -226,7 +229,10 @@ function bindFilterListeners() {
 
   document.getElementById("filter-school").addEventListener("change", () => onTeamFilterChange());
 
-  document.getElementById("filter-station").addEventListener("change", applyFilters);
+  document.getElementById("filter-station").addEventListener("change", () => {
+    setStoredStationPref(document.getElementById("filter-station").value);
+    applyFilters();
+  });
   document.getElementById("filter-status").addEventListener("change", applyFilters);
 }
 
@@ -416,13 +422,23 @@ async function applyUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const competition = params.get("competition");
   const teamId = params.get("team");
+  const station = params.get("station");
 
   if (competition) {
     const select = document.getElementById("filter-competition");
     if ([...select.options].some((o) => o.value === competition)) {
       select.value = competition;
+      setStoredCompetitionPref(competition);
       initTeamFilter();
       initStationFilter();
+    }
+  }
+
+  if (station) {
+    const stationSelect = document.getElementById("filter-station");
+    if ([...stationSelect.options].some((o) => o.value === station)) {
+      stationSelect.value = station;
+      setStoredStationPref(station);
     }
   }
 

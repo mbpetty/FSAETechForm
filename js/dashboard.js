@@ -1,6 +1,6 @@
 let resultsByTeam = new Map();
 let expandedTeamIds = new Set();
-let stationFilter = null;
+let stationFilter = getStoredDashboardStationFilter();
 
 function escapeHtml(text) {
   const el = document.createElement("span");
@@ -392,15 +392,8 @@ async function initCompetitionFilter() {
     .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`)
     .join("");
 
-  const params = new URLSearchParams(window.location.search);
-  const fromUrl = params.get("competition");
-  if (fromUrl && competitions.some((c) => c.id === fromUrl)) {
-    select.value = fromUrl;
-  } else if (competitions.some((c) => c.id === "june-ev")) {
-    select.value = "june-ev";
-  } else {
-    select.value = DEFAULT_COMPETITION;
-  }
+  select.value = pickCompetitionValue(select);
+  setStoredCompetitionPref(select.value);
 }
 
 function showToast(message) {
@@ -425,6 +418,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("dashboard-competition").addEventListener("change", async () => {
     expandedTeamIds.clear();
     stationFilter = null;
+    setStoredDashboardStationFilter(null);
+    setStoredCompetitionPref(getSelectedCompetitionId());
     initDashboardTeamFilter();
     try {
       await refreshResults();
@@ -435,6 +430,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("dashboard-status").addEventListener("change", () => {
     stationFilter = null;
+    setStoredDashboardStationFilter(null);
     renderTeamList();
   });
   document.getElementById("dashboard-team").addEventListener("change", renderTeamList);
@@ -443,6 +439,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btn = e.target.closest("[data-status-filter]");
     if (!btn) return;
     stationFilter = null;
+    setStoredDashboardStationFilter(null);
     const select = document.getElementById("dashboard-status");
     select.value = btn.dataset.statusFilter;
     renderTeamList();
@@ -457,6 +454,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       stationFilter?.stationId === nextFilter.stationId && stationFilter?.metric === nextFilter.metric;
 
     stationFilter = isSame ? null : nextFilter;
+    setStoredDashboardStationFilter(stationFilter);
 
     if (stationFilter) {
       document.getElementById("dashboard-status").value = "all";
